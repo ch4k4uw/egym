@@ -9,6 +9,7 @@ object Versions {
         const val Compose = "1.0.1"
         const val ConstraintLayout = "1.0.0-beta02"
         const val Activity = "1.3.1"
+        const val Icons = "1.0.0-alpha08"
     }
 
     object App {

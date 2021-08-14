@@ -1,7 +1,8 @@
 import configs.AndroidConfigs
+import extensions.internalModule
 
 plugins {
-    id(Plugins.Android.Appliction)
+    id(Plugins.Android.Application)
     kotlin(Plugins.Kotlin.Android)
     id(Plugins.Kotlin.Parcelize)
     kotlin(Plugins.Kotlin.Kapt)
@@ -62,7 +63,7 @@ android {
 
 configurations {
     api.configure {
-        //exclude(group = "androidx.annotation", module = "annotation")
+        exclude(group = "androidx.annotation", module = "annotation")
     }
 }
 
@@ -70,6 +71,8 @@ dependencies {
     configureBaseDependencies()
     configureBaseUiDependencies()
     configureCompose()
+
+    internalModule(InternalModules.components)
 
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)

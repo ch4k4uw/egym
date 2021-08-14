@@ -4,6 +4,8 @@ object Libraries {
         const val RuntimeLiveData = "androidx.compose.runtime:runtime-livedata:${Versions.Compose.Compose}"
         const val Ui = "androidx.compose.ui:ui:${Versions.Compose.Compose}"
         const val Material = "androidx.compose.material:material:${Versions.Compose.Compose}"
+        const val Icons = "androidx.compose.material:material-icons-core:${Versions.Compose.Icons}"
+        const val IconsExtended = "androidx.compose.material:material-icons-extended:${Versions.Compose.Icons}"
         const val UiTooling = "androidx.compose.ui:ui-tooling:${Versions.Compose.Compose}"
         const val Foundation = "androidx.compose.foundation:foundation:${Versions.Compose.Compose}"
         const val Compiler = "androidx.compose.compiler:compiler:${Versions.Compose.Compose}"

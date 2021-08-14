@@ -1,12 +1,12 @@
 object Plugins {
     object Android {
-        val Appliction = "com.android.application"
-        val Library = "com.android.library"
-        val LibraryModule = "android-library-module"
+        const val Application = "com.android.application"
+        const val Library = "com.android.library"
+        const val LibraryModule = "android-library-module"
     }
     object Kotlin {
-        val Android = "android"
-        val Parcelize = "kotlin-parcelize"
-        val Kapt = "kapt"
+        const val Android = "android"
+        const val Parcelize = "kotlin-parcelize"
+        const val Kapt = "kapt"
     }
 }
