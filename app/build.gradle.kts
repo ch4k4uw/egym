@@ -72,7 +72,7 @@ dependencies {
     configureBaseUiDependencies()
     configureCompose()
 
-    internalModule(InternalModules.components)
+    internalModule(InternalModules.core)
 
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)

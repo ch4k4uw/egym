@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.components
+package com.ch4k4uw.workout.egym.core
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.components
+package com.ch4k4uw.workout.egym.core
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.ch4k4uw.workout.egym.components.test", appContext.packageName)
+        assertEquals("com.ch4k4uw.workout.egym.core.test", appContext.packageName)
     }
 }

@@ -1,3 +1,3 @@
 object InternalModules {
-    const val components = ":components"
+    const val core = ":core"
 }
