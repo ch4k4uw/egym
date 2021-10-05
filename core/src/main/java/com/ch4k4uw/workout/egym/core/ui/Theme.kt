@@ -25,11 +25,11 @@ val LocalAppColors = staticCompositionLocalOf<AppColors> {
 @ExperimentalUnitApi
 @Composable
 fun AppTheme(
-    isLight: Boolean = isSystemInDarkTheme(),
+    isDark: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colors = AppColors(
-        material = if (isLight) ColorConstants.LightColors else ColorConstants.DarkColors
+        material = if (isDark) ColorConstants.DarkColors else ColorConstants.LightColors
     )
     val typography = AppTypography(
         material = TypographyConstants.Normal.material
