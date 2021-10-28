@@ -39,6 +39,9 @@ object Libraries {
 
     object Google {
         const val Material = "com.google.android.material:material:${Versions.Google.Material}"
+        object Gms {
+            const val Auth = "com.google.android.gms:play-services-auth:${Versions.Google.Gms.Auth}"
+        }
         object DaggerHilt {
             const val Android = "com.google.dagger:hilt-android:${Versions.DaggerHilt}"
             const val Compiler = "com.google.dagger:hilt-android-compiler:${Versions.DaggerHilt}"

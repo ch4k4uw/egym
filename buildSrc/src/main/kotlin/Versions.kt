@@ -21,6 +21,7 @@ object Versions {
         const val Material = "1.4.0"
         object Gms {
             const val Services = "4.3.10"
+            const val Auth = "19.2.0"
         }
     }
 

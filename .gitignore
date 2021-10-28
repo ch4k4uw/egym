@@ -6,3 +6,4 @@ cms_image_repository
 dealer.json
 local.properties
 *.DS_Store
+google.properties
