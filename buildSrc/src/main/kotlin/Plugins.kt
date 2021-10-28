@@ -9,4 +9,7 @@ object Plugins {
         const val Parcelize = "kotlin-parcelize"
         const val Kapt = "kapt"
     }
+    object Google {
+        const val Services = "com.google.gms.google-services"
+    }
 }

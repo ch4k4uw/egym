@@ -4,8 +4,6 @@ import org.gradle.kotlin.dsl.dependencies
 import extensions.implementation
 import org.gradle.api.JavaVersion
 import com.android.build.gradle.BaseExtension
-import org.gradle.kotlin.dsl.DependencyHandlerScope
-import org.gradle.kotlin.dsl.project
 
 fun Project.configureBaseDependencies() = dependencies {
     implementation(Libraries.Kotlin.StdLib)

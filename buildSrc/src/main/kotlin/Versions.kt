@@ -1,5 +1,5 @@
 object Versions {
-    const val Gradle = "7.0.0"
+    const val Gradle = "7.0.2"
     object Kotlin {
         const val Gradle = "1.5.21"
         const val Coroutines = "1.5.1"
@@ -19,6 +19,9 @@ object Versions {
 
     object Google {
         const val Material = "1.4.0"
+        object Gms {
+            const val Services = "4.3.10"
+        }
     }
 
     object AndroidX {
@@ -31,4 +34,8 @@ object Versions {
     const val LifeCycle = "2.3.1"
 
     const val JavaDesugaring = "1.1.5"
+
+    object Firebase {
+        const val BoM = "28.4.2"
+    }
 }

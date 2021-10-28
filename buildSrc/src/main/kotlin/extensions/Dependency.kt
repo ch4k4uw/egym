@@ -17,3 +17,6 @@ fun DependencyHandlerScope.kapt(dependecy: String) =
 
 fun DependencyHandlerScope.internalApi(dependecy: String) =
     add("api", project(dependecy))
+
+fun DependencyHandlerScope.platformImplementation(dependecy: String) =
+    add("implementation", platform(dependecy))

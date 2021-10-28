@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath(Dependencies.Gradle)
         classpath(Dependencies.Kotlin)
+        classpath(Dependencies.GoogleServices)
     }
 }
 

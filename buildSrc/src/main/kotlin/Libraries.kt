@@ -40,4 +40,11 @@ object Libraries {
     object Google {
         const val Material = "com.google.android.material:material:${Versions.Google.Material}"
     }
+
+    object Firebase {
+        const val BoM = "com.google.firebase:firebase-bom:${Versions.Firebase.BoM}"
+        const val Auth = "com.google.firebase:firebase-auth-ktx"
+        const val Firestore = "com.google.firebase:firebase-firestore-ktx"
+        const val RemoteConfig = "com.google.firebase:firebase-config-ktx"
+    }
 }
