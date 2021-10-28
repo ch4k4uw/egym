@@ -47,4 +47,10 @@ object Libraries {
         const val Firestore = "com.google.firebase:firebase-firestore-ktx"
         const val RemoteConfig = "com.google.firebase:firebase-config-ktx"
     }
+
+    object DaggerHilt {
+
+    }
+
+    const val Glide = "com.github.bumptech.glide:glide:${Versions.Glide}"
 }

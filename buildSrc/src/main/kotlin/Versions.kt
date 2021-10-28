@@ -38,4 +38,6 @@ object Versions {
     object Firebase {
         const val BoM = "28.4.2"
     }
+
+    const val Glide = "4.12.0"
 }

@@ -1,4 +1,4 @@
-import extensions.platformImplementation
+import extensions.versionSharing
 
 plugins {
     id(Plugins.Android.LibraryModule)
@@ -19,6 +19,7 @@ android {
 dependencies {
     configureBaseUiDependencies()
     configureCompose()
-    platformImplementation(Libraries.Firebase.BoM)
+    versionSharing(Libraries.Firebase.BoM)
     implementation(Libraries.Firebase.Auth)
+    implementation(Libraries.Glide)
 }
