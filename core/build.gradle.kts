@@ -7,7 +7,7 @@ plugins {
     id(Plugins.Android.LibraryModule)
     id(Plugins.Kotlin.Parcelize)
     id(Plugins.Google.Services)
-    id(Plugins.DaggerHilt)
+    id(Plugins.Hilt)
     id(Plugins.Kotlin.Kapt)
 }
 
@@ -52,6 +52,6 @@ dependencies {
     implementation(Libraries.Firebase.Auth)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
-    implementation(Libraries.Google.DaggerHilt.Android)
-    kapt(Libraries.Google.DaggerHilt.Compiler)
+    implementation(Libraries.Google.Hilt.Android)
+    kapt(Libraries.Google.Hilt.Compiler)
 }

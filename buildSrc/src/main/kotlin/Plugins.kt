@@ -13,5 +13,5 @@ object Plugins {
         const val Services = "com.google.gms.google-services"
     }
 
-    const val DaggerHilt = "dagger.hilt.android.plugin"
+    const val Hilt = "dagger.hilt.android.plugin"
 }

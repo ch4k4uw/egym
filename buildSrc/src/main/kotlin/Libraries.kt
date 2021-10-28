@@ -11,6 +11,8 @@ object Libraries {
         const val Compiler = "androidx.compose.compiler:compiler:${Versions.Compose.Compose}"
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.Compose.ConstraintLayout}"
         const val Activity = "androidx.activity:activity-ktx:${Versions.Compose.Activity}"
+        const val Navigation = "androidx.navigation:navigation-compose:${Versions.Compose.Compose}"
+        const val HiltNavigation = "androidx.hilt:hilt-navigation:${Versions.Compose.Hilt.Navigation}"
     }
 
     object Kotlin {
@@ -42,9 +44,9 @@ object Libraries {
         object Gms {
             const val Auth = "com.google.android.gms:play-services-auth:${Versions.Google.Gms.Auth}"
         }
-        object DaggerHilt {
-            const val Android = "com.google.dagger:hilt-android:${Versions.DaggerHilt}"
-            const val Compiler = "com.google.dagger:hilt-android-compiler:${Versions.DaggerHilt}"
+        object Hilt {
+            const val Android = "com.google.dagger:hilt-android:${Versions.Hilt}"
+            const val Compiler = "com.google.dagger:hilt-android-compiler:${Versions.Hilt}"
         }
     }
 

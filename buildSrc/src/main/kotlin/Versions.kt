@@ -10,6 +10,9 @@ object Versions {
         const val ConstraintLayout = "1.0.0-beta02"
         const val Activity = "1.3.1"
         const val Icons = "1.0.0-alpha08"
+        object Hilt {
+            const val Navigation = "1.0.0-alpha03"
+        }
     }
 
     object App {
@@ -42,5 +45,5 @@ object Versions {
 
     const val Glide = "4.12.0"
 
-    const val DaggerHilt = "2.38.1"
+    const val Hilt = "2.38.1"
 }
