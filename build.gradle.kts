@@ -8,6 +8,7 @@ buildscript {
         classpath(Dependencies.Gradle)
         classpath(Dependencies.Kotlin)
         classpath(Dependencies.GoogleServices)
+        classpath(Dependencies.DaggerHilt)
     }
 }
 

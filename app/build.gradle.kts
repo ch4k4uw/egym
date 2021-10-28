@@ -3,9 +3,9 @@ import extensions.internalModule
 
 plugins {
     id(Plugins.Android.Application)
-    kotlin(Plugins.Kotlin.Android)
+    id(Plugins.Kotlin.Android)
     id(Plugins.Kotlin.Parcelize)
-    kotlin(Plugins.Kotlin.Kapt)
+    id(Plugins.Kotlin.Kapt)
 }
 
 android {

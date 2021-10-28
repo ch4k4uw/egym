@@ -40,4 +40,6 @@ object Versions {
     }
 
     const val Glide = "4.12.0"
+
+    const val DaggerHilt = "2.38.1"
 }

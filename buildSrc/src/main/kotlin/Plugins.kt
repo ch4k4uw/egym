@@ -5,11 +5,13 @@ object Plugins {
         const val LibraryModule = "android-library-module"
     }
     object Kotlin {
-        const val Android = "android"
+        const val Android = "kotlin-android"
         const val Parcelize = "kotlin-parcelize"
-        const val Kapt = "kapt"
+        const val Kapt = "kotlin-kapt"
     }
     object Google {
         const val Services = "com.google.gms.google-services"
     }
+
+    const val DaggerHilt = "dagger.hilt.android.plugin"
 }

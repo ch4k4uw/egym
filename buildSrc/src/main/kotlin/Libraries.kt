@@ -39,6 +39,10 @@ object Libraries {
 
     object Google {
         const val Material = "com.google.android.material:material:${Versions.Google.Material}"
+        object DaggerHilt {
+            const val Android = "com.google.dagger:hilt-android:${Versions.DaggerHilt}"
+            const val Compiler = "com.google.dagger:hilt-android-compiler:${Versions.DaggerHilt}"
+        }
     }
 
     object Firebase {
@@ -46,10 +50,6 @@ object Libraries {
         const val Auth = "com.google.firebase:firebase-auth-ktx"
         const val Firestore = "com.google.firebase:firebase-firestore-ktx"
         const val RemoteConfig = "com.google.firebase:firebase-config-ktx"
-    }
-
-    object DaggerHilt {
-
     }
 
     const val Glide = "com.github.bumptech.glide:glide:${Versions.Glide}"
