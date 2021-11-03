@@ -53,5 +53,7 @@ dependencies {
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
     implementation(Libraries.Google.Hilt.Android)
+    implementation(Libraries.Accompanist.SysUIController)
+    implementation(Libraries.Accompanist.Insets)
     kapt(Libraries.Google.Hilt.Compiler)
 }

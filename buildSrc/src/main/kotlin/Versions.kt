@@ -8,6 +8,7 @@ object Versions {
     object Compose {
         const val Compose = "1.0.2"
         const val ConstraintLayout = "1.0.0-beta02"
+        const val ActivityKtx = "1.3.1"
         const val Activity = "1.3.1"
         const val Icons = "1.0.0-alpha08"
         object Hilt {
@@ -46,4 +47,6 @@ object Versions {
     const val Glide = "4.12.0"
 
     const val Hilt = "2.38.1"
+
+    const val Accompanist = "0.20.0"
 }

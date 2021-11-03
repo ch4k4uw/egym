@@ -4,6 +4,7 @@ import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
+import com.ch4k4uw.workout.egym.core.ui.AppColors
 
 @Suppress("unused")
 internal object ColorConstants {
@@ -20,36 +21,49 @@ internal object ColorConstants {
     private val Amber200Normal = Color(0xffffe082)
     private val DarkGrey = Color(0xff121212)
     private val DarkRed = Color(0xffcf6679)
+    private val LightSurface = Color.White
 
-    val LightColors = lightColors(
-        primary = BlueGray900Normal,
-        primaryVariant = BlueGray900Dark,
-        secondary = Amber700Normal,
-        secondaryVariant = Amber700Dark,
-        background = Color.White,
-        surface = Color.White,
-        error = Red50Normal,
-        onPrimary = Amber50Normal,
-        onSecondary = BlueGray900Normal,
-        onBackground = Color.Black,
-        onSurface = Color.Black,
-        onError = Color.White
-    )
+    val LightColors: AppColors by lazy {
+        AppColors(
+            material = lightColors(
+                primary = BlueGray900Normal,
+                primaryVariant = BlueGray900Dark,
+                secondary = Amber700Normal,
+                secondaryVariant = Amber700Dark,
+                background = Color.White,
+                surface = LightSurface,
+                error = Red50Normal,
+                onPrimary = Amber50Normal,
+                onSecondary = BlueGray900Normal,
+                onBackground = Color.Black,
+                onSurface = Color.Black,
+                onError = Color.White
+            ),
+            googleButton = LightSurface
+        )
+    }
 
-    val DarkColors = darkColors(
-        primary = BlueGray200Normal,
-        primaryVariant = BlueGray700Normal,
-        secondary = Amber200Normal,
-        secondaryVariant = Amber700Normal,
-        background = DarkGrey,
-        surface = DarkGrey,
-        error = DarkRed,
-        onPrimary = Color.Black,
-        onSecondary = Color.Black,
-        onBackground = Color.White,
-        onSurface = Color.White,
-        onError = Color.Black
-    )
+    private val DarkSurface = DarkGrey
+
+    val DarkColors: AppColors by lazy {
+        AppColors(
+            material = darkColors(
+                primary = BlueGray200Normal,
+                primaryVariant = BlueGray700Normal,
+                secondary = Amber200Normal,
+                secondaryVariant = Amber700Normal,
+                background = DarkGrey,
+                surface = DarkSurface,
+                error = DarkRed,
+                onPrimary = Color.Black,
+                onSecondary = Color.Black,
+                onBackground = Color.White,
+                onSurface = Color.White,
+                onError = Color.Black
+            ),
+            googleButton = Color(color = 0xFF4285F4)
+        )
+    }
 
     val Colors.primaryLight: Color
         get() = if (isLight) BlueGray900Light else BlueGray200Normal

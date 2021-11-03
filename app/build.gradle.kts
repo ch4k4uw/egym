@@ -77,6 +77,8 @@ dependencies {
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)
     implementation(Libraries.Google.Material)
+    implementation(Libraries.Accompanist.Insets)
+    implementation(Libraries.Accompanist.InsetsUi)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

@@ -28,6 +28,7 @@ fun Project.configureCompose() = dependencies {
     implementation(Libraries.Compose.UiTooling)
     implementation(Libraries.Compose.Foundation)
     implementation(Libraries.Compose.Compiler)
+    implementation(Libraries.Compose.ActivityKtx)
     implementation(Libraries.Compose.Activity)
     implementation(Libraries.Compose.ConstraintLayout)
 }

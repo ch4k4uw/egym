@@ -10,7 +10,8 @@ object Libraries {
         const val Foundation = "androidx.compose.foundation:foundation:${Versions.Compose.Compose}"
         const val Compiler = "androidx.compose.compiler:compiler:${Versions.Compose.Compose}"
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.Compose.ConstraintLayout}"
-        const val Activity = "androidx.activity:activity-ktx:${Versions.Compose.Activity}"
+        const val ActivityKtx = "androidx.activity:activity-ktx:${Versions.Compose.ActivityKtx}"
+        const val Activity = "androidx.activity:activity-compose:${Versions.Compose.Activity}"
         const val Navigation = "androidx.navigation:navigation-compose:${Versions.Compose.Compose}"
         const val HiltNavigation = "androidx.hilt:hilt-navigation:${Versions.Compose.Hilt.Navigation}"
     }
@@ -58,4 +59,10 @@ object Libraries {
     }
 
     const val Glide = "com.github.bumptech.glide:glide:${Versions.Glide}"
+
+    object Accompanist {
+        const val SysUIController = "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist}"
+        const val Insets = "com.google.accompanist:accompanist-insets:${Versions.Accompanist}"
+        const val InsetsUi = "com.google.accompanist:accompanist-insets-ui:${Versions.Accompanist}"
+    }
 }
