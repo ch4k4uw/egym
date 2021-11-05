@@ -1,11 +1,16 @@
 import configs.AndroidConfigs
+import extensions.implementation
 import extensions.internalModule
+import extensions.kapt
+import extensions.versionSharing
 
 plugins {
     id(Plugins.Android.Application)
     id(Plugins.Kotlin.Android)
     id(Plugins.Kotlin.Parcelize)
+    id(Plugins.Hilt)
     id(Plugins.Kotlin.Kapt)
+    id(Plugins.Google.Services)
 }
 
 android {
@@ -63,7 +68,7 @@ android {
 
 configurations {
     api.configure {
-        exclude(group = "androidx.annotation", module = "annotation")
+        //exclude(group = "androidx.annotation", module = "annotation")
     }
 }
 
@@ -79,6 +84,16 @@ dependencies {
     implementation(Libraries.Google.Material)
     implementation(Libraries.Accompanist.Insets)
     implementation(Libraries.Accompanist.InsetsUi)
+    versionSharing(Libraries.Firebase.BoM)
+    implementation(Libraries.Firebase.Auth)
+    implementation(Libraries.Google.Gms.Auth)
+    implementation(Libraries.Compose.Navigation)
+    implementation(Libraries.Compose.Annotation)
+
+    //Hilt
+    implementation(Libraries.Compose.HiltNavigation)
+    implementation(Libraries.Google.Hilt.Android)
+    kapt(Libraries.Google.Hilt.Compiler)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

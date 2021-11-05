@@ -6,16 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.login.LoginScreen
+import com.ch4k4uw.workout.egym.navigation.Navigation
+import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalUnitApi
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             AppTheme {
-                LoginScreen()
+                Navigation()
             }
         }
     }

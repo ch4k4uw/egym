@@ -12,8 +12,9 @@ object Libraries {
         const val ConstraintLayout = "androidx.constraintlayout:constraintlayout-compose:${Versions.Compose.ConstraintLayout}"
         const val ActivityKtx = "androidx.activity:activity-ktx:${Versions.Compose.ActivityKtx}"
         const val Activity = "androidx.activity:activity-compose:${Versions.Compose.Activity}"
-        const val Navigation = "androidx.navigation:navigation-compose:${Versions.Compose.Compose}"
+        const val Navigation = "androidx.navigation:navigation-compose:${Versions.Compose.Navigation}"
         const val HiltNavigation = "androidx.hilt:hilt-navigation:${Versions.Compose.Hilt.Navigation}"
+        const val Annotation = "androidx.annotation:annotation:${Versions.Compose.Annotation}"
     }
 
     object Kotlin {

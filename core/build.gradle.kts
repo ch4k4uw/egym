@@ -52,8 +52,10 @@ dependencies {
     implementation(Libraries.Firebase.Auth)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
-    implementation(Libraries.Google.Hilt.Android)
     implementation(Libraries.Accompanist.SysUIController)
     implementation(Libraries.Accompanist.Insets)
+
+    //Hilt
+    implementation(Libraries.Google.Hilt.Android)
     kapt(Libraries.Google.Hilt.Compiler)
 }
