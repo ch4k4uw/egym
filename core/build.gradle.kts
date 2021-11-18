@@ -52,6 +52,8 @@ dependencies {
     implementation(Libraries.Firebase.Auth)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
+
+    //Accompanist
     implementation(Libraries.Accompanist.SysUIController)
     implementation(Libraries.Accompanist.Insets)
 

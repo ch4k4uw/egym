@@ -1,8 +1,9 @@
 package com.ch4k4uw.workout.egym
 
+import com.ch4k4uw.workout.egym.extensions.asUriString
+import com.ch4k4uw.workout.egym.extensions.toParcelable
+import com.ch4k4uw.workout.egym.login.interaction.UserView
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,6 +13,9 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val user = UserView("1", "2", "3", "4")
+        val user64 = user.asUriString
+        val user2 = user64.toParcelable<UserView>()
+        println(user2)
     }
 }

@@ -2,6 +2,7 @@ package com.ch4k4uw.workout.egym.core.auth.infra.injection
 
 import android.content.Context
 import com.ch4k4uw.workout.egym.core.BuildConfig
+import com.ch4k4uw.workout.egym.core.R
 import com.ch4k4uw.workout.egym.core.auth.domain.service.ParseGoogleFirebaseSignInResultService
 import com.ch4k4uw.workout.egym.core.auth.infra.service.ParseGoogleFirebaseSignInResultServiceImpl
 import com.ch4k4uw.workout.egym.core.common.infra.AppDispatchers
@@ -19,9 +20,12 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(ActivityComponent::class)
 class FirebaseModule {
     @Provides
-    fun provideSignInClient(context: Context): GoogleSignInClient {
+    fun provideSignInClient(
+        context: Context,
+        @WebClientId webClientId: String
+    ): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(BuildConfig.DEFAULT_WEB_CLIENT_ID)
+            .requestIdToken(webClientId)
             .requestEmail()
             .build()
         return GoogleSignIn.getClient(context, gso)

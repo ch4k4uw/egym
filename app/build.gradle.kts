@@ -82,8 +82,6 @@ dependencies {
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)
     implementation(Libraries.Google.Material)
-    implementation(Libraries.Accompanist.Insets)
-    implementation(Libraries.Accompanist.InsetsUi)
     versionSharing(Libraries.Firebase.BoM)
     implementation(Libraries.Firebase.Auth)
     implementation(Libraries.Google.Gms.Auth)
@@ -95,7 +93,17 @@ dependencies {
     implementation(Libraries.Google.Hilt.Android)
     kapt(Libraries.Google.Hilt.Compiler)
 
+    //Accompanist
+    implementation(Libraries.Accompanist.Insets)
+    implementation(Libraries.Accompanist.InsetsUi)
+    implementation(Libraries.Accompanist.Insets)
+    implementation(Libraries.Accompanist.SysUIController)
+
     testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:core:1.4.0")
+    androidTestImplementation("androidx.test.ext:truth:1.4.0")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }

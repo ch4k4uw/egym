@@ -3,10 +3,6 @@ package com.ch4k4uw.workout.egym.login
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,17 +16,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -39,10 +33,12 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
 import com.ch4k4uw.workout.egym.core.ui.components.SignInGoogleButton
 import com.ch4k4uw.workout.egym.core.ui.components.SocialMediaButtonDefaults
+import com.ch4k4uw.workout.egym.extensions.HandleEvent
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
+import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
 import com.ch4k4uw.workout.egym.state.AppState
 import com.google.accompanist.insets.navigationBarsPadding
 
@@ -61,9 +57,9 @@ fun LoginScreen(
         }
     }
 
-    (uiState.value as? AppState.Success<*>)
-        ?.also {
-            when(it.content) {
+    uiState.HandleEvent {
+        (this as? AppState.Success<LoginState>)?.let {
+            when (it.content) {
                 is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
                     it.content.intent
                 )
@@ -72,6 +68,7 @@ fun LoginScreen(
                 )
             }
         }
+    }
 
     val image = ImageBitmap
         .imageResource(id = R.drawable.login_background)
@@ -79,6 +76,7 @@ fun LoginScreen(
         .imageResource(id = R.drawable.login_anim_background)
 
     val bkgAnim = rememberBkgAnimation()
+    val screenWidthPx = LocalContext.current.resources.displayMetrics.widthPixels
 
     Box(
         modifier = Modifier
@@ -103,10 +101,14 @@ fun LoginScreen(
                         val placeable = measurable.measure(constraints)
                         layout(placeable.width, placeable.height) {
                             if (!bkgAnim.isStarted) {
-                                bkgAnim.target = placeable.width / 2
+                                bkgAnim.target = placeable.width - screenWidthPx
+                            }
+                            val anchor = object {
+                                val w = placeable.width
+                                var x = (w - screenWidthPx) / 2
                             }
                             placeable.placeRelative(
-                                x = (-placeable.width / 4) + bkgAnim.offset,
+                                x = anchor.x - bkgAnim.offset,
                                 y = 0
                             )
                         }
@@ -119,6 +121,7 @@ fun LoginScreen(
                     .fillMaxSize()
             )
         }
+
         if (!uiState.isLoading) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,56 +150,6 @@ fun LoginScreen(
         }
         ContentLoadingProgressBar(visible = uiState.isLoading)
     }
-}
-
-@Composable
-fun rememberBkgAnimation(): BkgAnimation {
-    var bkgAnimStarted by remember { mutableStateOf(false) }
-    var xOffsetTarget by remember { mutableStateOf(0) }
-    val xOffset: Int by animateIntAsState(
-        targetValue = xOffsetTarget,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 120000),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-
-    return remember {
-        BkgAnimation(
-            {
-                bkgAnimStarted
-            },
-            {
-                if (it != null) {
-                    xOffsetTarget = it
-                    bkgAnimStarted = true
-                }
-                xOffsetTarget
-            },
-            {
-                xOffset
-            }
-        )
-    }
-}
-
-@Stable
-class BkgAnimation(
-    private val isAnimStartedGetter: () -> Boolean,
-    private val xOffsetTargetGetterSetter: (Int?) -> Int,
-    private val xOffsetGetter: () -> Int
-) {
-    val isStarted: Boolean
-        get() = isAnimStartedGetter()
-
-    var target: Int
-        get() = xOffsetTargetGetterSetter(null)
-        set(value) {
-            xOffsetTargetGetterSetter(value)
-        }
-
-    val offset: Int
-        get() = xOffsetGetter()
 }
 
 @ExperimentalUnitApi

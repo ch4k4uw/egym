@@ -1,6 +1,7 @@
 package com.ch4k4uw.workout.egym.login
 
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ch4k4uw.workout.egym.login.domain.interactor.LoginInteractor
@@ -56,6 +57,7 @@ class LoginViewModel @Inject constructor(
                 .catch {
                     emit(AppState.Loaded())
                     emit(AppState.Error(cause = it))
+                    it.printStackTrace()
                 }
                 .collect {
                     emit(AppState.Loaded())

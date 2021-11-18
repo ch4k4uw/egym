@@ -2,15 +2,16 @@ package com.ch4k4uw.workout.egym.core.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import com.ch4k4uw.workout.egym.core.ui.color.ColorConstants
 import com.ch4k4uw.workout.egym.core.ui.dimens.DimensConstants
 import com.ch4k4uw.workout.egym.core.ui.shape.ShapeConstants
 import com.ch4k4uw.workout.egym.core.ui.typography.TypographyConstants
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @ExperimentalUnitApi
 val LocalAppTypography = staticCompositionLocalOf {
@@ -43,8 +44,6 @@ fun AppTheme(
     val typography = TypographyConstants.Normal
     val shapes = ShapeConstants.Normal
 
-    val systemUiController = rememberSystemUiController()
-
     CompositionLocalProvider(
         LocalAppShapeCornerDimens provides appShapeCornerDimens,
         LocalAppColors provides colors,
@@ -60,13 +59,6 @@ fun AppTheme(
                 content()
             }
         }
-    }
-
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
-            darkIcons = !isDark
-        )
     }
 }
 
