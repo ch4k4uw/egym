@@ -10,7 +10,8 @@ object Versions {
         const val ConstraintLayout = "1.0.0-beta02"
         const val ActivityKtx = "1.3.1"
         const val Activity = "1.3.1"
-        const val Icons = "1.0.0-alpha08"
+        const val Icons = "1.0.5"
+        const val IconsExtended = "1.0.0-beta09"
         const val Navigation = "2.4.0-alpha06"
         const val Annotation = "1.3.0"
         object Hilt {

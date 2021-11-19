@@ -1,23 +1,24 @@
 package com.ch4k4uw.workout.egym.core.auth.infra.repository
 
-import android.content.Context
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
+import com.ch4k4uw.workout.egym.core.auth.domain.repository.UserCmdRepository
 import com.ch4k4uw.workout.egym.core.auth.domain.repository.UserRepository
 import com.ch4k4uw.workout.egym.core.auth.infra.injection.FirebaseSubComponent
 import com.ch4k4uw.workout.egym.core.common.infra.AppDispatchers
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
-    context: Context,
+class UserCmdRepositoryImpl @Inject constructor(
     private val dispatchers: AppDispatchers,
     fbSubComponentFactory: FirebaseSubComponent.Factory
-) : UserRepository {
+) : UserCmdRepository {
     private val fbSubComponent: FirebaseSubComponent = fbSubComponentFactory
-        .create(context = context)
+        .create()
 
     private val fbAuth: FirebaseAuth
         get() = fbSubComponent.fbAuth
@@ -37,5 +38,12 @@ class UserRepositoryImpl @Inject constructor(
             }
             emit(domainUser)
         }.flowOn(dispatchers.io)
+    }
+
+    override suspend fun performLogout(): Flow<Unit> {
+        return flow {
+            fbAuth.signOut()
+            emit(Unit)
+        }
     }
 }

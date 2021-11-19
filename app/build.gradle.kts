@@ -87,6 +87,9 @@ dependencies {
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Compose.Navigation)
     implementation(Libraries.Compose.Annotation)
+    implementation(Libraries.Compose.Icons)
+    implementation(Libraries.Compose.IconsExtended)
+    implementation(Libraries.Glide)
 
     //Hilt
     implementation(Libraries.Compose.HiltNavigation)

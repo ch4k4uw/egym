@@ -14,6 +14,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
@@ -21,7 +22,7 @@ import dagger.hilt.components.SingletonComponent
 class FirebaseModule {
     @Provides
     fun provideSignInClient(
-        context: Context,
+        @ApplicationContext context: Context,
         @WebClientId webClientId: String
     ): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

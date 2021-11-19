@@ -3,6 +3,8 @@ package com.ch4k4uw.workout.egym.login
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,6 +37,8 @@ import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
 import com.ch4k4uw.workout.egym.core.ui.components.SignInGoogleButton
 import com.ch4k4uw.workout.egym.core.ui.components.SocialMediaButtonDefaults
 import com.ch4k4uw.workout.egym.extensions.HandleEvent
+import com.ch4k4uw.workout.egym.extensions.handleSuccess
+import com.ch4k4uw.workout.egym.extensions.isIdle
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
@@ -58,25 +63,32 @@ fun LoginScreen(
     }
 
     uiState.HandleEvent {
-        (this as? AppState.Success<LoginState>)?.let {
-            when (it.content) {
+        handleSuccess {
+            when (content) {
                 is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
-                    it.content.intent
+                    content.intent
                 )
                 is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
-                    it.content.user
+                    content.user
                 )
             }
         }
     }
 
-    val image = ImageBitmap
+    val loginAvatarImage = ImageBitmap
         .imageResource(id = R.drawable.login_background)
-    val animImage = ImageBitmap
+    val backgroundImage = ImageBitmap
         .imageResource(id = R.drawable.login_anim_background)
 
     val bkgAnim = rememberBkgAnimation()
     val screenWidthPx = LocalContext.current.resources.displayMetrics.widthPixels
+    val showInteractionControls = !uiState.isLoading && !uiState.isIdle &&
+            (uiState.value as? AppState.Success<LoginState>)
+                ?.content !is LoginState.ShowSignedInUser
+    val interactionControlsAlpha by animateFloatAsState(
+        targetValue = if (!showInteractionControls) 0f else 1f,
+        animationSpec = tween(durationMillis = 300)
+    )
 
     Box(
         modifier = Modifier
@@ -91,7 +103,7 @@ fun LoginScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             Image(
-                bitmap = animImage,
+                bitmap = backgroundImage,
                 alpha = .7f,
                 contentDescription = null,
                 modifier = Modifier
@@ -115,38 +127,39 @@ fun LoginScreen(
                     }
             )
             Image(
-                bitmap = image,
+                bitmap = loginAvatarImage,
+                alpha = interactionControlsAlpha,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
             )
         }
 
-        if (!uiState.isLoading) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.2f)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = AppTheme.Dimens.shapeCorner.medium * 8f,
+                        topEnd = AppTheme.Dimens.shapeCorner.medium * 8f
+                    )
+                )
+                .background(color = AppTheme.colors.material.onSurface.copy(
+                    alpha = .1f * interactionControlsAlpha
+                ))
+                .padding(AppTheme.Dimens.shapeCorner.medium * 8f)
+        ) {
+            SignInGoogleButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(.2f)
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = AppTheme.Dimens.shapeCorner.medium * 8f,
-                            topEnd = AppTheme.Dimens.shapeCorner.medium * 8f
-                        )
-                    )
-                    .background(color = AppTheme.colors.material.onSurface.copy(alpha = .1f))
-                    .padding(AppTheme.Dimens.shapeCorner.medium * 8f)
-            ) {
-                SignInGoogleButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(SocialMediaButtonDefaults.height),
-                    onClick = {
-                        onIntent(LoginIntent.PerformFirebaseGoogleSignIn)
-                    }
-                )
-            }
+                    .height(SocialMediaButtonDefaults.height),
+                onClick = {
+                    onIntent(LoginIntent.PerformFirebaseGoogleSignIn)
+                }
+            )
         }
         ContentLoadingProgressBar(visible = uiState.isLoading)
     }

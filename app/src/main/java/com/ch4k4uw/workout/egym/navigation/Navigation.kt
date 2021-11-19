@@ -1,5 +1,6 @@
 package com.ch4k4uw.workout.egym.navigation
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -78,15 +79,29 @@ fun Navigation() {
                 )
             }
             val viewModel: HomeViewModel = navBackStackEntry.viewModel()
+            val backPressOwner = LocalOnBackPressedDispatcherOwner.current
             HomeScreen(
-                uiState = viewModel.uiState.collectAsState(initial = AppState.Idle())
+                uiState = viewModel.uiState.collectAsState(initial = AppState.Idle()),
+                onIntent = viewModel::performIntent,
+                onLoggedOut = {
+                    navController
+                        .navigate(route = Screen.Login.route) {
+                            popUpTo(
+                                route = navBackStackEntry.destination.route ?: ""
+                            ) {
+                                inclusive = true
+                            }
+                        }
+                },
+                onNavigateBack = {
+                    backPressOwner?.onBackPressedDispatcher?.onBackPressed()
+                }
             )
 
             val barColor = AppTheme.colors.material.primaryVariant
             SideEffect {
                 systemUiController.setSystemBarsColor(
-                    color = barColor,
-                    darkIcons = !isDark
+                    color = barColor
                 )
             }
         }

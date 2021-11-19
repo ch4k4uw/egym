@@ -1,9 +1,9 @@
 package com.ch4k4uw.workout.egym.login
 
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.login.domain.interactor.LoginInteractor
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
@@ -24,6 +24,29 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     private val mutableUiState = MutableSharedFlow<AppState<LoginState>>(replay = 1)
     val uiState: Flow<AppState<LoginState>> = mutableUiState
+
+    init {
+        viewModelScope.launch {
+            emit(AppState.Loading())
+            loginInteractor
+                .findLoggerUser()
+                .catch {
+                    emit(AppState.Loaded())
+                    emit(AppState.Error(cause = it))
+                    it.printStackTrace()
+                }
+                .collect {
+                    emit(AppState.Loaded())
+                    if (it != User.Empty) {
+                        emit(
+                            AppState.Success(
+                                content = LoginState.ShowSignedInUser(user = it.toView())
+                            )
+                        )
+                    }
+                }
+        }
+    }
 
     fun performIntent(intent: LoginIntent) {
         when (intent) {
