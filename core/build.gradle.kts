@@ -6,7 +6,6 @@ import java.util.Properties
 plugins {
     id(Plugins.Android.LibraryModule)
     id(Plugins.Kotlin.Parcelize)
-    id(Plugins.Google.Services)
     id(Plugins.Hilt)
     id(Plugins.Kotlin.Kapt)
 }
@@ -21,7 +20,7 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
             val propertyFile = "../google.properties"
             val properties = file(propertyFile).exists().let { fileStatus ->
                 if (fileStatus) {
@@ -41,6 +40,14 @@ android {
                     "\"${properties.getProperty("requestIdToken")}\""
                 )
             }
+            buildConfigField("String", "TABLE_EXERCISE", "\"exercise\"")
+            buildConfigField("String", "TABLE_TRAINING_PLAN", "\"dev-training-plan\"")
+            buildConfigField("String", "TABLE_TRAINING_EXECUTION", "\"dev-training-exec\"")
+        }
+        release {
+            buildConfigField("String", "TABLE_EXERCISE", "\"exercise\"")
+            buildConfigField("String", "TABLE_TRAINING_PLAN", "\"training-plan\"")
+            buildConfigField("String", "TABLE_TRAINING_EXECUTION", "\"training-exec\"")
         }
     }
 }
@@ -50,6 +57,7 @@ dependencies {
     configureCompose()
     versionSharing(Libraries.Firebase.BoM)
     implementation(Libraries.Firebase.Auth)
+    implementation(Libraries.Firebase.Firestore)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
 

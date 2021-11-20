@@ -2,12 +2,8 @@ package com.ch4k4uw.workout.egym.core.auth.infra.repository
 
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.core.auth.domain.repository.UserCmdRepository
-import com.ch4k4uw.workout.egym.core.auth.domain.repository.UserRepository
 import com.ch4k4uw.workout.egym.core.auth.infra.injection.FirebaseSubComponent
 import com.ch4k4uw.workout.egym.core.common.infra.AppDispatchers
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -20,8 +16,13 @@ class UserCmdRepositoryImpl @Inject constructor(
     private val fbSubComponent: FirebaseSubComponent = fbSubComponentFactory
         .create()
 
-    private val fbAuth: FirebaseAuth
-        get() = fbSubComponent.fbAuth
+    private val googleSignInContainer by lazy {
+        fbSubComponent.googleSignInContainer
+    }
+
+    private val fbAuth by lazy {
+        googleSignInContainer.fbAuth
+    }
 
     override suspend fun findLoggedUser(): Flow<User> {
         return flow {

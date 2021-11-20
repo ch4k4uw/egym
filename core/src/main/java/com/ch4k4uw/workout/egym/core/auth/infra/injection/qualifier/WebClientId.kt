@@ -1,7 +1,5 @@
-package com.ch4k4uw.workout.egym.core.auth.infra.injection
+package com.ch4k4uw.workout.egym.core.auth.infra.injection.qualifier
 
-import java.lang.annotation.ElementType
-import java.lang.annotation.Target
 import javax.inject.Qualifier
 
 @Qualifier

@@ -1,49 +1,48 @@
 package com.ch4k4uw.workout.egym.core.auth.infra.injection
 
 import android.content.Context
-import com.ch4k4uw.workout.egym.core.BuildConfig
-import com.ch4k4uw.workout.egym.core.R
 import com.ch4k4uw.workout.egym.core.auth.domain.service.ParseGoogleFirebaseSignInResultService
+import com.ch4k4uw.workout.egym.core.auth.infra.injection.qualifier.GoogleSignInIntent
+import com.ch4k4uw.workout.egym.core.auth.infra.injection.qualifier.WebClientId
+import com.ch4k4uw.workout.egym.core.auth.infra.service.GoogleSignInContainer
 import com.ch4k4uw.workout.egym.core.auth.infra.service.ParseGoogleFirebaseSignInResultServiceImpl
 import com.ch4k4uw.workout.egym.core.common.infra.AppDispatchers
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.scopes.FragmentScoped
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(FragmentComponent::class)
 class FirebaseModule {
     @Provides
-    fun provideSignInClient(
+    @FragmentScoped
+    fun provideGoogleSignInContainer(
         @ApplicationContext context: Context,
         @WebClientId webClientId: String
-    ): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(webClientId)
-            .requestEmail()
-            .build()
-        return GoogleSignIn.getClient(context, gso)
-    }
+    ): GoogleSignInContainer =
+        GoogleSignInContainer(
+            context = context,
+            webClientId = webClientId
+        )
 
     @Provides
-    fun provideFirebaseAuth(): FirebaseAuth =
-        FirebaseAuth.getInstance()
-
-    @Provides
+    @FragmentScoped
     fun provideParseGoogleFirebaseSignInResultService(
-        fbAuth: FirebaseAuth,
+        googleSignInContainer: GoogleSignInContainer,
         appDispatchers: AppDispatchers
     ): ParseGoogleFirebaseSignInResultService =
         ParseGoogleFirebaseSignInResultServiceImpl(
-            fbAuth = fbAuth,
+            fbAuth = googleSignInContainer.fbAuth,
             dispatchers = appDispatchers
         )
+
+    @Provides
+    @FragmentScoped
+    @GoogleSignInIntent
+    fun provideGoogleSignInIntent(googleSignInContainer: GoogleSignInContainer) =
+        googleSignInContainer.signInIntent
 
 }

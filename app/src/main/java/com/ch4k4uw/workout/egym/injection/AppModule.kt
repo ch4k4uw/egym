@@ -2,7 +2,7 @@ package com.ch4k4uw.workout.egym.injection
 
 import android.content.Context
 import com.ch4k4uw.workout.egym.R
-import com.ch4k4uw.workout.egym.core.auth.infra.injection.WebClientId
+import com.ch4k4uw.workout.egym.core.auth.infra.injection.qualifier.WebClientId
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

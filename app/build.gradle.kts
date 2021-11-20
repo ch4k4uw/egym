@@ -17,7 +17,7 @@ android {
     compileSdk = AndroidConfigs.Sdk.Compile
 
     defaultConfig {
-        applicationId = "com.ch4k4uw.workout.egym"
+        applicationId = AndroidConfigs.appId
         minSdk = AndroidConfigs.Sdk.Min
         targetSdk = AndroidConfigs.Sdk.Target
         versionCode = Versions.App.Code
@@ -82,9 +82,6 @@ dependencies {
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)
     implementation(Libraries.Google.Material)
-    versionSharing(Libraries.Firebase.BoM)
-    implementation(Libraries.Firebase.Auth)
-    implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Compose.Navigation)
     implementation(Libraries.Compose.Annotation)
     implementation(Libraries.Compose.Icons)

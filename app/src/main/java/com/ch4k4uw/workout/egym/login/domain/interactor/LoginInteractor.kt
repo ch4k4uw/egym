@@ -18,7 +18,7 @@ class LoginInteractor @Inject constructor(
         .create()
 
     fun findGoogleFbSignInIntent(): Flow<Intent> =
-        flowOf(fbSubComponent.googleSignInClient.signInIntent)
+        flowOf(fbSubComponent.googleSignInIntent)
 
     fun parseGoogleFbSignInResult(intent: Intent): Flow<User> =
         fbSubComponent.parseGoogleFirebaseSignInResult.parse(intent = intent)
