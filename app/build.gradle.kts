@@ -63,6 +63,15 @@ android {
         resources.excludes += "META-INF/LGPL2.1"
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("./app/src/debug/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
 }
 
 configurations {

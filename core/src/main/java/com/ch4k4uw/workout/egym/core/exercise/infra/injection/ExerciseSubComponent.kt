@@ -7,7 +7,11 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.hilt.android.scopes.ActivityScoped
 
-@Subcomponent
+@Subcomponent(
+    modules = [
+        ExerciseDataModule::class
+    ]
+)
 @ActivityScoped
 interface ExerciseSubComponent {
     @Subcomponent.Factory

@@ -28,6 +28,7 @@ import com.ch4k4uw.workout.egym.extensions.HandleEvent
 import com.ch4k4uw.workout.egym.extensions.asSuccess
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading
+import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.home.interaction.HomeIntent
 import com.ch4k4uw.workout.egym.home.interaction.HomeState
 import com.ch4k4uw.workout.egym.state.AppState
@@ -49,12 +50,10 @@ fun HomeScreen(
         }
     }
 
-    uiState.HandleEvent {
-        handleSuccess {
-            when(content) {
-                is HomeState.ShowLoginScreen -> onLoggedOut()
-                else -> Unit
-            }
+    uiState.raiseEvent().handleSuccess {
+        when (content) {
+            is HomeState.ShowLoginScreen -> onLoggedOut()
+            else -> Unit
         }
     }
 
@@ -67,7 +66,14 @@ fun HomeScreen(
                 TopAppBar(
                     modifier = Modifier
                         .statusBarsPadding(),
-                    title = { Text(text = stringResource(id = R.string.home_screen_label, userName)) },
+                    title = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.home_screen_label,
+                                userName
+                            )
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { onNavigateBack() }) {
                             Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")

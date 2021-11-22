@@ -9,8 +9,9 @@ import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.Exercise
 import com.ch4k4uw.workout.egym.core.extensions.asLocalDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class ExerciseHeadPagerImpl(
+class ExerciseHeadPagerImpl @Inject constructor(
     @ExerciseCollectionCount
     collectionCount: Int,
     @ExerciseCollectionPageSize

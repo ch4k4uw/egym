@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.layout
@@ -36,10 +37,10 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
 import com.ch4k4uw.workout.egym.core.ui.components.SignInGoogleButton
 import com.ch4k4uw.workout.egym.core.ui.components.SocialMediaButtonDefaults
-import com.ch4k4uw.workout.egym.extensions.HandleEvent
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isIdle
 import com.ch4k4uw.workout.egym.extensions.isLoading
+import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
@@ -62,16 +63,14 @@ fun LoginScreen(
         }
     }
 
-    uiState.HandleEvent {
-        handleSuccess {
-            when (content) {
-                is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
-                    content.intent
-                )
-                is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
-                    content.user
-                )
-            }
+    uiState.raiseEvent().handleSuccess {
+        when (content) {
+            is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
+                content.intent
+            )
+            is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
+                content.user
+            )
         }
     }
 
@@ -141,15 +140,18 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(.2f)
+                .alpha(alpha = interactionControlsAlpha)
                 .clip(
                     RoundedCornerShape(
                         topStart = AppTheme.Dimens.shapeCorner.medium * 8f,
                         topEnd = AppTheme.Dimens.shapeCorner.medium * 8f
                     )
                 )
-                .background(color = AppTheme.colors.material.onSurface.copy(
-                    alpha = .1f * interactionControlsAlpha
-                ))
+                .background(
+                    color = AppTheme.colors.material.onSurface.copy(
+                        alpha = .1f
+                    )
+                )
                 .padding(AppTheme.Dimens.shapeCorner.medium * 8f)
         ) {
             SignInGoogleButton(
