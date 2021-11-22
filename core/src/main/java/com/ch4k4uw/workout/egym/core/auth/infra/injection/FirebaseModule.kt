@@ -10,15 +10,15 @@ import com.ch4k4uw.workout.egym.core.common.infra.AppDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.FragmentScoped
+import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
-@InstallIn(FragmentComponent::class)
+@InstallIn(ActivityComponent::class)
 class FirebaseModule {
     @Provides
-    @FragmentScoped
+    @ActivityScoped
     fun provideGoogleSignInContainer(
         @ApplicationContext context: Context,
         @WebClientId webClientId: String
@@ -29,7 +29,7 @@ class FirebaseModule {
         )
 
     @Provides
-    @FragmentScoped
+    @ActivityScoped
     fun provideParseGoogleFirebaseSignInResultService(
         googleSignInContainer: GoogleSignInContainer,
         appDispatchers: AppDispatchers
@@ -40,7 +40,7 @@ class FirebaseModule {
         )
 
     @Provides
-    @FragmentScoped
+    @ActivityScoped
     @GoogleSignInIntent
     fun provideGoogleSignInIntent(googleSignInContainer: GoogleSignInContainer) =
         googleSignInContainer.signInIntent

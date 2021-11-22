@@ -18,12 +18,10 @@ object Versions {
             const val Navigation = "1.0.0-alpha03"
         }
     }
-
     object App {
         const val Code = 1
         const val Name = "1.0"
     }
-
     object Google {
         const val Material = "1.4.0"
         object Gms {
@@ -31,25 +29,20 @@ object Versions {
             const val Auth = "19.2.0"
         }
     }
-
     object AndroidX {
         object Ktx {
             const val Core = "1.6.0"
         }
         const val AppCompat = "1.3.1"
     }
-
     const val LifeCycle = "2.3.1"
-
     const val JavaDesugaring = "1.1.5"
-
     object Firebase {
         const val BoM = "28.4.2"
     }
-
     const val Glide = "4.12.0"
-
     const val Hilt = "2.38.1"
-
     const val Accompanist = "0.20.0"
+    const val Retrofit = "2.9.0"
+    const val LoggingInterceptor = "4.9.0"
 }

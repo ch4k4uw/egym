@@ -20,7 +20,7 @@ fun Project.configureBaseUiDependencies() = dependencies {
     implementation(Libraries.LifeCycle.Compiler)
 }
 
-fun Project.configureCompose() = dependencies {
+fun Project.configureComposeDependencies() = dependencies {
     implementation(Libraries.Compose.Runtime)
     implementation(Libraries.Compose.RuntimeLiveData)
     implementation(Libraries.Compose.Ui)
@@ -31,6 +31,11 @@ fun Project.configureCompose() = dependencies {
     implementation(Libraries.Compose.ActivityKtx)
     implementation(Libraries.Compose.Activity)
     implementation(Libraries.Compose.ConstraintLayout)
+}
+
+fun Project.configureNetworkingDependencies() = dependencies {
+    implementation(Libraries.Retrofit.Retrofit)
+    implementation(Libraries.Retrofit.GSonConverter)
 }
 
 fun Project.configureAsAndroidLibrary() {

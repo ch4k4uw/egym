@@ -2,7 +2,6 @@ import configs.AndroidConfigs
 import extensions.implementation
 import extensions.internalModule
 import extensions.kapt
-import extensions.versionSharing
 
 plugins {
     id(Plugins.Android.Application)
@@ -75,7 +74,7 @@ configurations {
 dependencies {
     configureBaseDependencies()
     configureBaseUiDependencies()
-    configureCompose()
+    configureComposeDependencies()
 
     internalModule(InternalModules.core)
 

@@ -11,7 +11,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
 @InstallIn(ViewModelComponent::class)
-abstract class UserModule {
+abstract class UserRepositoryModule {
     @Binds
     @ViewModelScoped
     abstract fun bindUserRepository(impl: UserCmdRepositoryImpl): UserRepository

@@ -1,0 +1,17 @@
+{
+  "name": "apis",
+  "description": "Apis for Firebase management help",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "14"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "firebase-admin": "^9.8.0",
+    "fs-extra": "^10.0.0"
+  },
+  "private": true
+}

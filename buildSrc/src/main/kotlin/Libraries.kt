@@ -16,14 +16,12 @@ object Libraries {
         const val HiltNavigation = "androidx.hilt:hilt-navigation:${Versions.Compose.Hilt.Navigation}"
         const val Annotation = "androidx.annotation:annotation:${Versions.Compose.Annotation}"
     }
-
     object Kotlin {
         const val StdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.Kotlin.Gradle}"
         const val Coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.Coroutines}"
         const val CoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.Coroutines}"
         const val CoroutinesPlayServices = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.Kotlin.CoroutinesPlayServices}"
     }
-
     object LifeCycle {
         const val Runtime = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.LifeCycle}"
         const val LiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.LifeCycle}"
@@ -31,16 +29,13 @@ object Libraries {
         const val Kapt = "androidx.lifecycle:lifecycle-compiler:${Versions.LifeCycle}"
         const val Compiler = "androidx.lifecycle:lifecycle-common-java8:${Versions.LifeCycle}"
     }
-
     const val JavaDesugaring = "com.android.tools:desugar_jdk_libs:${Versions.JavaDesugaring}"
-
     object AndroidX {
         object Ktx {
             const val Core = "androidx.core:core-ktx:${Versions.AndroidX.Ktx.Core}"
         }
         const val AppCompat = "androidx.appcompat:appcompat:${Versions.AndroidX.AppCompat}"
     }
-
     object Google {
         const val Material = "com.google.android.material:material:${Versions.Google.Material}"
         object Gms {
@@ -51,19 +46,21 @@ object Libraries {
             const val Compiler = "com.google.dagger:hilt-android-compiler:${Versions.Hilt}"
         }
     }
-
     object Firebase {
         const val BoM = "com.google.firebase:firebase-bom:${Versions.Firebase.BoM}"
         const val Auth = "com.google.firebase:firebase-auth-ktx"
         const val Firestore = "com.google.firebase:firebase-firestore-ktx"
         const val RemoteConfig = "com.google.firebase:firebase-config-ktx"
     }
-
     const val Glide = "com.github.bumptech.glide:glide:${Versions.Glide}"
-
     object Accompanist {
         const val SysUIController = "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist}"
         const val Insets = "com.google.accompanist:accompanist-insets:${Versions.Accompanist}"
         const val InsetsUi = "com.google.accompanist:accompanist-insets-ui:${Versions.Accompanist}"
     }
+    object Retrofit {
+        const val Retrofit = "com.squareup.retrofit2:retrofit:${Versions.Retrofit}"
+        const val GSonConverter = "com.squareup.retrofit2:converter-gson:${Versions.Retrofit}"
+    }
+    const val LoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.LoggingInterceptor}"
 }
