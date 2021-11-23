@@ -85,30 +85,30 @@ class NotFoundError extends Error {
 //  pc: Page count. *Required if: get next page*.
 //  cc: Collection count. *Required if: get next page*.
 router.get('/exercise/head', async (req, res) => {
-    const collectionPrefix = req.query.cp;
-    const collectionName = (collectionPrefix ? `${collectionPrefix}_` : '') + 'exercise' + `_${req._suffix}`;
-    const queryString = req.query.qs ? req.query.qs.toLowerCase() : undefined;
-    const queryTags = req.query.tg? req.query.tg instanceof Array? req.query.tg : [req.query.tg] : undefined;
-    const lastTitle = req.query.ls ? req.query.ls.toLowerCase() : undefined;
-    const lastCreatedAt = req.query.ld;
-    const pageSize = req.query.sz;
-    let currentPageIndex = req.query.cr || 0;
-    const operation = req.query.op;
-    let pageCount = req.query.pc;
-    let collectionCount = req.query.cc;
+    try {
+        const collectionPrefix = req.query.cp;
+        const collectionName = (collectionPrefix ? `${collectionPrefix}_` : '') + 'exercise' + `_${req._suffix}`;
+        const queryString = req.query.qs ? req.query.qs.toLowerCase() : undefined;
+        const queryTags = req.query.tg? req.query.tg instanceof Array? req.query.tg : [req.query.tg] : undefined;
+        const lastTitle = req.query.ls ? req.query.ls.toLowerCase() : undefined;
+        const lastCreatedAt = req.query.ld;
+        const pageSize = req.query.sz ? +req.query.sz : undefined;
+        let currentPageIndex = req.query.cr || 0;
+        const operation = req.query.op;
+        let pageCount = req.query.pc;
+        let collectionCount = req.query.cc;
 
-    let isBadRequest = false;
-    if (operation === 'next') {
-        isBadRequest = !lastTitle || !lastCreatedAt || !pageCount || !collectionCount;
-    }
-    if (!isBadRequest) {
-        isBadRequest = !pageSize;
-    }
-    if (isBadRequest) {
-        res.status(400).send({ message: 'invalid parameter.' });
-        return;
-    } else {
-        try {
+        let isBadRequest = false;
+        if (operation === 'next') {
+            isBadRequest = !lastTitle || !lastCreatedAt || !pageCount || !collectionCount;
+        }
+        if (!isBadRequest) {
+            isBadRequest = !pageSize;
+        }
+        if (isBadRequest) {
+            res.status(400).send({ message: 'invalid parameter.' });
+            return;
+        } else {
             log(`finding in '${collectionName}' collection.`);
             const collection = db.collection(collectionName);
             if (!collectionCount) {
@@ -182,13 +182,12 @@ router.get('/exercise/head', async (req, res) => {
                 queryString: queryString,
                 queryTags: queryTags
             });
-
-        } catch (e) {
-            if (!isProduction()) {
-                logError(e);
-            }
-            res.status(500).send({ message: 'internal server error', cause: e || 'unknown' });
         }
+    } catch (e) {
+        if (!isProduction()) {
+            logError(e);
+        }
+        res.status(500).send({ message: 'internal server error', cause: e || 'unknown' });
     }
 });
 
