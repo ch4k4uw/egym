@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.core.common.infra.data
+package com.ch4k4uw.workout.egym.core.exercise.infra.data
 
 import com.google.gson.annotations.SerializedName
 

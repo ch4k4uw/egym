@@ -1,28 +1,32 @@
 package com.ch4k4uw.workout.egym.core.exercise.infra.data
 
-import com.ch4k4uw.workout.egym.core.BuildConfig
-import com.ch4k4uw.workout.egym.core.common.infra.service.FindPagedFirebaseDocumentService
+import com.ch4k4uw.workout.egym.core.common.infra.service.HelperApi
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseHeadPager
+import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.exercise.domain.entity.ExerciseHead
-import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.ExerciseCollectionCount
-import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.ExerciseCollectionPageSize
-import com.ch4k4uw.workout.egym.core.extensions.asLocalDateTime
+import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.ExerciseHeadPageSize
+import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.ExerciseHeadQueryString
+import com.ch4k4uw.workout.egym.core.exercise.infra.injection.qualifier.ExerciseHeadQueryTags
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.time.ZoneId
 import javax.inject.Inject
 
 class ExerciseHeadPagerImpl @Inject constructor(
-    @ExerciseCollectionCount
-    collectionCount: Int,
-    @ExerciseCollectionPageSize
+    private val helperApi: HelperApi,
+    @ExerciseHeadPageSize
     override val size: Int,
-    private val findPagedDocSvc: FindPagedFirebaseDocumentService
+    @ExerciseHeadQueryString
+    private val queryString: String?,
+    @ExerciseHeadQueryTags
+    private val queryTags: List<ExerciseTag>?
 ) : ExerciseHeadPager {
-    override val count: Int by lazy {
-        (collectionCount / size) + if (collectionCount.rem(size) != 0) 1 else 0
-    }
+    private var collectionCount = 0
 
-    override var index: Int = 0
+    override var count: Int = 0
+        private set
+
+    override var index: Int = -1
         private set
 
     override var items: List<ExerciseHead> = listOf()
@@ -30,30 +34,41 @@ class ExerciseHeadPagerImpl @Inject constructor(
 
     override suspend fun next(): Flow<ExerciseHeadPager> = flow {
         if (index < count) {
-            items = findNextPage()
+            findNextPage()
             ++index
         }
         emit(this@ExerciseHeadPagerImpl)
     }
 
-    private suspend fun findNextPage(): List<ExerciseHead> =
-        findPagedDocSvc.find(
-            collection = BuildConfig.TABLE_EXERCISE,
-            orderBy = ExerciseConstants.Field.Title,
-            lastDoc = if (items.isNotEmpty()) {
-               items[size - 1].title
-            } else {
-               Unit
-            },
-            pageSize = size,
-        ) {
-            ExerciseHead(
-                id = id,
-                title = getString(ExerciseConstants.Field.Title).orEmpty(),
-                image = getString(ExerciseConstants.Field.Images).orEmpty(),
-                created = getLong(ExerciseConstants.Field.Created).asLocalDateTime,
-                updated = getLong(ExerciseConstants.Field.Updated).asLocalDateTime,
-            )
+    private suspend fun findNextPage() {
+        if (index == -1) {
+            helperApi
+                .findExerciseHeadPager(
+                    pageSize = size,
+                    queryString = queryString,
+                    queryTags = queryTags?.map { it.raw }
+                ).also(::updateData)
+        } else {
+            helperApi
+                .findNextExerciseHeadPage(
+                    pageSize = size,
+                    collectionCount = collectionCount,
+                    pageIndex = index,
+                    lastItemTitle = items.last().title,
+                    lastItemTime = items.last().created.atZone(ZoneId.systemDefault())
+                        .toInstant().toEpochMilli(),
+                    pageCount = count,
+                    queryString = queryString,
+                    queryTags = queryTags?.map { it.raw }
+                ).also(::updateData)
         }
+    }
+
+    private fun updateData(pagerRemote: ExerciseHeadPagerRemote) {
+        index = pagerRemote.index
+        count = pagerRemote.count
+        collectionCount = pagerRemote.itemsCount
+        items = pagerRemote.items.map { it.toDomain() }
+    }
 
 }

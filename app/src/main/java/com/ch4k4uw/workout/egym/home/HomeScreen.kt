@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
-import com.ch4k4uw.workout.egym.extensions.HandleEvent
 import com.ch4k4uw.workout.egym.extensions.asSuccess
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading

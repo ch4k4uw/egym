@@ -8,4 +8,4 @@ import javax.inject.Qualifier
     AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.PROPERTY_GETTER,
 )
-annotation class ExerciseCollectionPageSize
+annotation class ExerciseHeadQueryString
