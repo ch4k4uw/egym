@@ -87,9 +87,9 @@ class NotFoundError extends Error {
 router.get('/exercise/head', async (req, res) => {
     const collectionPrefix = req.query.cp;
     const collectionName = (collectionPrefix ? `${collectionPrefix}_` : '') + 'exercise' + `_${req._suffix}`;
-    const queryString = req.query.qs;
-    const queryTags = req.query.tg;
-    const lastTitle = req.query.ls;
+    const queryString = req.query.qs ? req.query.qs.toLowerCase() : undefined;
+    const queryTags = req.query.tg? req.query.tg instanceof Array? req.query.tg : [req.query.tg] : undefined;
+    const lastTitle = req.query.ls ? req.query.ls.toLowerCase() : undefined;
     const lastCreatedAt = req.query.ld;
     const pageSize = req.query.sz;
     let currentPageIndex = req.query.cr || 0;
@@ -99,7 +99,7 @@ router.get('/exercise/head', async (req, res) => {
 
     let isBadRequest = false;
     if (operation === 'next') {
-        isBadRequest = !lastTitle || !lastCreatedAt || !pageCount || !collectionCount || queryString || queryTags;
+        isBadRequest = !lastTitle || !lastCreatedAt || !pageCount || !collectionCount;
     }
     if (!isBadRequest) {
         isBadRequest = !pageSize;
@@ -113,19 +113,18 @@ router.get('/exercise/head', async (req, res) => {
             const collection = db.collection(collectionName);
             if (!collectionCount) {
                 let query = collection
-                .select(admin.firestore.FieldPath.documentId())
-                .orderBy('title')
-                .orderBy('created');
-
+                    .select(admin.firestore.FieldPath.documentId())
+                    .orderBy('titleIns')
+                    .orderBy('created');
+                if (queryTags) {
+                    log('Has queryTags');
+                    query = query.where('tags', 'array-contains-any', queryTags);
+                }
                 if (queryString) {
                     log('Has queryString');
                     query = query
                         .startAt(queryString)
                         .endAt(`${queryString}\uF8FF`);
-                }
-                if (queryTags) {
-                    log('Has queryTags');
-                    query = query.where('tags', 'array-contains', queryTags);
                 }
                 collectionCount = (await query.get()).docs.length;
             }
@@ -134,31 +133,35 @@ router.get('/exercise/head', async (req, res) => {
             }
             let query = collection
                 .select('title', 'images', 'created', 'updated')
-                .orderBy('title')
+                .orderBy('titleIns')
                 .orderBy('created');
 
+            if (queryTags) {
+                query = query.where('tags', 'array-contains-any', queryTags)
+            }
+
+            if (queryString) {
+                query = query
+                    .startAt(queryString)
+                    .endAt(`${queryString}\uF8FF`);
+            }
+
             let performQuery = true;
-            if (queryString || (lastTitle && lastCreatedAt)) {
-                if (queryString) {
+            let pageSizeDelta = 0;
+            if (lastTitle && lastCreatedAt) {
+                if (currentPageIndex < pageCount - 1) {
                     query = query
-                        .startAt(queryString)
-                        .endAt(`${queryString}\uF8FF`);
-                } else {
-                    if (currentPageIndex < pageCount) {
-                        query = query
-                            .startAfter(lastTitle, lastCreatedAt);
-                        ++currentPageIndex;
-                    } else {
-                        performQuery = false;
+                        .startAfter(lastTitle, lastCreatedAt);
+                    ++currentPageIndex;
+                    if (currentPageIndex === pageCount - 1) {
+                        pageSizeDelta = (currentPageIndex * pageCount) - collectionCount;
                     }
+                } else {
+                    performQuery = false;
                 }
             }
 
-            if (queryTags) {
-                query = query.where('tags', 'array-contains', queryTags)
-            }
-
-            query = query.limit(performQuery ? +pageSize: 0);
+            query = query.limit(performQuery ? +pageSize-pageSizeDelta: 0);
 
             const items = performQuery ? (await query.get()).docs.map(doc => {
                 return { 
@@ -175,7 +178,9 @@ router.get('/exercise/head', async (req, res) => {
                 count: pageCount,
                 size: pageSize,
                 items,
-                itemsCount: collectionCount
+                itemsCount: collectionCount,
+                queryString: queryString,
+                queryTags: queryTags
             });
 
         } catch (e) {
@@ -221,7 +226,7 @@ else {
             const batch = db.batch();
             const ref = db.collection('exercise_en');
             const now = new Date();
-            for(let i=5; i<enData.length; ++i) {
+            for(let i=0; i<enData.length; ++i) {
                 const data = enData[i];
                 const doc = ref.doc();
                 data.created = now.getTime();
@@ -229,6 +234,7 @@ else {
                 batch.set(doc, data);
             }
             await batch.commit();
+            log(`Written ${enData.length} registers for 'en' exercises.`)
         }
         console.log(`\nListening at ${port} port`);
     });
