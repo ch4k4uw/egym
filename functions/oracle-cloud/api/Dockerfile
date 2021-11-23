@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm config set loglevel warn \
     && npm config set only production \
 	&& npm config set progress false \
-    && npm ci --only=productio
+    && npm ci --only=production
 
 COPY . .
 
