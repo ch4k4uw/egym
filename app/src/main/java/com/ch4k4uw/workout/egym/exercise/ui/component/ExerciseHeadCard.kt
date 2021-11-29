@@ -35,6 +35,7 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 
 @ExperimentalUnitApi
@@ -48,10 +49,10 @@ fun ExerciseHeadCard(
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val imageHeight = maxWidth * .7f
+        val imageHeight = maxWidth * EGymTheme.Dimens.exerciseHeadCard.imageHeight
 
         Column {
-            Card(elevation = 3.dp, shape = RectangleShape) {
+            Card(elevation = EGymTheme.Dimens.exerciseHeadCard.cardElevation, shape = RectangleShape) {
                 Column {
                     var image by remember { mutableStateOf<Bitmap?>(null) }
                     var error by remember { mutableStateOf(false) }
@@ -127,11 +128,14 @@ fun ExerciseHeadCard(
                             Icon(imageVector = errorImage, contentDescription = null)
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(
+                        modifier = Modifier
+                            .height(EGymTheme.Dimens.exerciseHeadCard.titleMarginTop)
+                    )
                     Text(text = title, style = AppTheme.typography.material.h6)
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(EGymTheme.Dimens.exerciseHeadCard.cardMarginBottom))
         }
     }
 }

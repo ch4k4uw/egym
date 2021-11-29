@@ -13,4 +13,12 @@ object DimensConstants {
             logoutButtonIconPadding = 8.dp
         )
     }
+    object ExerciseHeadCard {
+        val normal = EGymDimens.ExerciseHeadCard(
+            imageHeight = .7f,
+            cardElevation = 3.dp,
+            titleMarginTop = 4.dp,
+            cardMarginBottom = 8.dp
+        )
+    }
 }

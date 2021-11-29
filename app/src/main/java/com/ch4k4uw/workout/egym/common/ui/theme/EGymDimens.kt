@@ -10,4 +10,10 @@ sealed class EGymDimens {
         val logoutButtonBottomPadding: Dp,
         val logoutButtonIconPadding: Dp
     ) : EGymDimens()
+    data class ExerciseHeadCard(
+        val imageHeight: Float,
+        val cardElevation: Dp,
+        val titleMarginTop: Dp,
+        val cardMarginBottom: Dp
+    ) : EGymDimens()
 }

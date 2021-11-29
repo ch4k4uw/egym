@@ -10,10 +10,15 @@ private val LocalEGymProfileDialogDimens = staticCompositionLocalOf<EGymDimens.P
     TODO("Undefined")
 }
 
+private val LocalEGymExerciseHeadCardDimens = staticCompositionLocalOf<EGymDimens.ExerciseHeadCard> {
+    TODO("Undefined")
+}
+
 @Composable
 fun EGymTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        LocalEGymProfileDialogDimens provides DimensConstants.ProfileDialog.normal
+        LocalEGymProfileDialogDimens provides DimensConstants.ProfileDialog.normal,
+        LocalEGymExerciseHeadCardDimens provides DimensConstants.ExerciseHeadCard.normal
     ) {
         content()
     }
@@ -25,5 +30,9 @@ object EGymTheme {
             @ReadOnlyComposable
             @Composable
             get() = LocalEGymProfileDialogDimens.current
+        val exerciseHeadCard: EGymDimens.ExerciseHeadCard
+            @ReadOnlyComposable
+            @Composable
+            get() = LocalEGymExerciseHeadCardDimens.current
     }
 }
