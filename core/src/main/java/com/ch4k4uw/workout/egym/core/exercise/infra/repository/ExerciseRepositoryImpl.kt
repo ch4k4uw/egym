@@ -12,7 +12,7 @@ import javax.inject.Inject
 class ExerciseRepositoryImpl @Inject constructor(
     private val exerciseSubComponentFactory: ExerciseSubComponent.Factory
 ) : ExerciseRepository {
-    override suspend fun findHeads(
+    override suspend fun findHeadsPager(
         query: String,
         tags: List<ExerciseTag>,
         options: ExercisePagerOptions

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -31,8 +32,12 @@ import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
 import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ListLoadingShimmer1
+import com.ch4k4uw.workout.egym.core.ui.components.ShimmerCardListItem2
+import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseHeadCard
+import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
@@ -50,12 +55,22 @@ fun ExerciseListScreen(
     val uiStateValue = uiState.value
     var userData by remember { mutableStateOf(UserView.Empty) }
     var isProfileDialogShowing by remember { mutableStateOf(false) }
+    var exercisesHeads by remember { mutableStateOf(listOf<ExerciseHeadView>()) }
+    var showShimmer by remember { mutableStateOf(true) }
 
-    uiState.raiseEvent().handleSuccess {
-        when (content) {
-            is ExerciseListState.DisplayUserData -> userData = content.user
-            is ExerciseListState.ShowLoginScreen -> onLoggedOut()
-            else -> Unit
+    uiState.raiseEvent().apply {
+        handleSuccess {
+            when (content) {
+                is ExerciseListState.DisplayUserData -> userData = content.user
+                is ExerciseListState.ShowLoginScreen -> onLoggedOut()
+                is ExerciseListState.ShowExerciseList -> exercisesHeads =
+                    mutableListOf(*content.exercises.toTypedArray())
+                is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer = false
+                else -> Unit
+            }
+        }
+        handleError {
+            showShimmer = false
         }
     }
 
@@ -95,9 +110,30 @@ fun ExerciseListScreen(
                 )
             },
             content = {
-                if(uiStateValue is AppState.Loading<*>) {
-                    if(uiStateValue.tag is ExerciseListState.ExerciseListTag) {
-                        ListLoadingShimmer1()
+                if (uiStateValue is AppState.Loading<*>) {
+                    if (uiStateValue.tag is ExerciseListState.ExerciseListTag) {
+                        if (exercisesHeads.isEmpty()) {
+                            ListLoadingShimmer1()
+                        }
+                    }
+                }
+                if(exercisesHeads.isNotEmpty()) {
+                    LazyColumn {
+                        val exercisesCount = exercisesHeads.size
+                        items(count = exercisesCount, key = { exercisesHeads[it].id }) { index ->
+                            ExerciseHeadCard(
+                                imageUrl = exercisesHeads[index].image,
+                                title = exercisesHeads[index].title
+                            )
+                        }
+                        if (showShimmer) {
+                            item {
+                                ShimmerCardListItem2 {
+                                    onIntent(ExerciseListIntent.FetchNextPage)
+                                }
+                            }
+                        }
+
                     }
                 }
             }

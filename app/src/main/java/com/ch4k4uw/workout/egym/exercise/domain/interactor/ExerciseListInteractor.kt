@@ -18,11 +18,11 @@ class ExerciseListInteractor @Inject constructor(
     suspend fun performLogout(): Flow<Unit> =
         userRepository.performLogout()
 
-    suspend fun findExercisesHeads(
+    suspend fun findExercisesHeadsPager(
         query: String = "",
         tags: List<ExerciseTag> = listOf()
     ): Flow<ExerciseHeadPager> =
-        exerciseRepository.findHeads(
+        exerciseRepository.findHeadsPager(
             query = query,
             tags = tags,
             options = ExercisePagerOptions(size = 5)

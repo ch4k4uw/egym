@@ -7,27 +7,37 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 
 @Composable
-fun ListLoadingShimmer1(
-    count: Int = 3,
-    onItemSideEffect: (index: Int) -> Unit = {}
+fun ShimmerCardListItem2(
+    padding: Dp = 0.dp,
+    onSideEffect: () -> Unit = {}
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val imageHeight = with(LocalDensity.current) { maxWidth * .7f }
+        val imageHeight = maxWidth * .7f
         val cardWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val cardHeightPx = with(LocalDensity.current) { imageHeight.toPx() }
         val gradientWidth: Float = (0.2f * cardHeightPx)
@@ -67,36 +77,80 @@ fun ListLoadingShimmer1(
             }
         }.toList()
 
-        LazyColumn {
-            items(count) { index ->
-                ShimmerCardListItem1(
-                    colors = colors,
-                    xShimmer = xCardShimmer.value,
-                    yShimmer = yCardShimmer.value,
-                    cardHeight = imageHeight,
-                    gradientWidth = gradientWidth,
-                    padding = 0.dp,
-                    onSideEffect = { onItemSideEffect(index) }
+        val brush = linearGradient(
+            colors,
+            start = Offset(xCardShimmer.value - gradientWidth, yCardShimmer.value - gradientWidth),
+            end = Offset(xCardShimmer.value, yCardShimmer.value)
+        )
+        Column(modifier = Modifier.padding(padding)) {
+            Surface(
+                shape = AppTheme.shapes.material.small,
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .background(brush = brush)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                shape = AppTheme.shapes.material.small,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight / 10)
+                        .background(brush = brush)
                 )
             }
         }
+    }
+    SideEffect {
+        onSideEffect()
     }
 }
 
 @ExperimentalUnitApi
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewListLoadingShimmer1Dark() {
+private fun PreviewShimmerCardListItem1Dark() {
     AppTheme {
-        ListLoadingShimmer1()
+        val colors = listOf(
+            Color.DarkGray.copy(alpha = .9f),
+            Color.DarkGray.copy(alpha = .3f),
+            Color.DarkGray.copy(alpha = .9f),
+        )
+        ShimmerCardListItem1(
+            colors = colors,
+            xShimmer = 190f,
+            yShimmer = 190f,
+            cardHeight = 300.dp,
+            gradientWidth = with(LocalDensity.current) { 20.dp.toPx() },
+            padding = 0.dp
+        )
     }
 }
 
 @ExperimentalUnitApi
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun PreviewListLoadingShimmer1Light() {
+private fun PreviewShimmerCardListItem1Light() {
     AppTheme {
-        ListLoadingShimmer1()
+        val colors = listOf(
+            Color.LightGray.copy(alpha = .9f),
+            Color.LightGray.copy(alpha = .3f),
+            Color.LightGray.copy(alpha = .9f),
+        )
+        ShimmerCardListItem1(
+            colors = colors,
+            xShimmer = 50f,
+            yShimmer = 50f,
+            cardHeight = 300.dp,
+            gradientWidth = with(LocalDensity.current) { 20.dp.toPx() },
+            padding = 0.dp
+        )
     }
 }

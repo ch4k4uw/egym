@@ -95,6 +95,10 @@ fun BottomBarNavigation(
             bottomBarProperties
                 .setTo(paddingValues.calculateBottomPadding())
         }
-        content(PaddingValues(bottom = bottomBarProperties.floatAnimation))
+        content(
+            PaddingValues(
+                bottom = paddingValues.calculateBottomPadding() - bottomBarProperties.floatAnimation
+            )
+        )
     }
 }

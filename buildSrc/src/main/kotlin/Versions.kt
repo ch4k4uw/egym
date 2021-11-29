@@ -34,6 +34,7 @@ object Versions {
             const val Core = "1.6.0"
         }
         const val AppCompat = "1.3.1"
+        const val Palette = "1.0.0"
     }
     const val LifeCycle = "2.3.1"
     const val JavaDesugaring = "1.1.5"
