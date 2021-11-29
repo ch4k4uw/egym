@@ -20,26 +20,40 @@ android {
     }
 
     buildTypes {
-        debug {
-            val propertyFile = "../google.properties"
-            val properties = file(propertyFile).exists().let { fileStatus ->
-                if (fileStatus) {
-                    val stream = file(propertyFile).inputStream()
-                    Properties().also {
-                        it.load(stream)
-                        stream.close()
-                    }
-                } else {
-                    null
+        fun readProperties(propertyFile: String) = file(propertyFile).exists().let { fileStatus ->
+            if (fileStatus) {
+                val stream = file(propertyFile).inputStream()
+                Properties().also {
+                    it.load(stream)
+                    stream.close()
                 }
+            } else {
+                null
             }
-            if (properties != null) {
+        }
+
+        all {
+            val googleProperties = readProperties(propertyFile = "../google.properties")
+            val apiKeysProperties = readProperties(propertyFile = "../api-keys.properties")
+
+            if (googleProperties != null) {
                 buildConfigField(
                     "String",
                     "DEFAULT_WEB_CLIENT_ID",
-                    "\"${properties.getProperty("requestIdToken")}\""
+                    "\"${googleProperties.getProperty("requestIdToken")}\""
                 )
             }
+
+            if (apiKeysProperties != null) {
+                buildConfigField(
+                    "String",
+                    "API_AUTH",
+                    "\"${apiKeysProperties.getProperty("key1")}\""
+                )
+            }
+        }
+        
+        debug {
             buildConfigField("String", "TABLE_EXERCISE", "\"exercise\"")
             buildConfigField("String", "TABLE_TRAINING_PLAN", "\"dev-training-plan\"")
             buildConfigField("String", "TABLE_TRAINING_EXECUTION", "\"dev-training-exec\"")
