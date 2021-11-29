@@ -23,6 +23,6 @@ class LoginInteractor @Inject constructor(
     fun parseGoogleFbSignInResult(intent: Intent): Flow<User> =
         fbSubComponent.parseGoogleFirebaseSignInResult.parse(intent = intent)
 
-    suspend fun findLoggerUser(): Flow<User> =
+    suspend fun findLoggedUser(): Flow<User> =
         userRepository.findLoggedUser()
 }

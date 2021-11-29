@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
+import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.navigation.Navigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,7 +18,9 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             AppTheme {
-                Navigation()
+                EGymTheme {
+                    Navigation()
+                }
             }
         }
     }

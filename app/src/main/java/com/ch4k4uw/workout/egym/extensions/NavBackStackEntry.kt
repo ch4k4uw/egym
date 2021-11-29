@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
-import com.ch4k4uw.workout.egym.common.DecodeFromRouteService
+import com.ch4k4uw.workout.egym.common.domain.DecodeFromRouteService
 
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.viewModel(): T {

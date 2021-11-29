@@ -29,7 +29,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             emit(AppState.Loading())
             loginInteractor
-                .findLoggerUser()
+                .findLoggedUser()
                 .catch {
                     emit(AppState.Loaded())
                     emit(AppState.Error(cause = it))

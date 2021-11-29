@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.common
+package com.ch4k4uw.workout.egym.common.domain
 
 import android.net.Uri
 import android.os.Parcel

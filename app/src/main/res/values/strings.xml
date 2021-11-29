@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">eGym</string>
     <string name="home_screen_label">eGym - %1$s</string>
+
+    <string name="navigation_exercise_list_label">Exercises</string>
+    <string name="navigation_exercise_plans_label">Plans</string>
+
+    <string name="exercise_list_title">Exercises</string>
+    <string name="exercise_plans_title">Plans</string>
+
+    <string name="profile_dialog_exit_button_label">Exit</string>
 </resources>

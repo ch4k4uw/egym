@@ -1,5 +1,5 @@
 object Versions {
-    const val Gradle = "7.0.2"
+    const val Gradle = "7.0.3"
     object Kotlin {
         const val Gradle = "1.5.30"
         const val Coroutines = "1.5.1"

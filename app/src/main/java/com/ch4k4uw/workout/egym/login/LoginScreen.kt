@@ -46,7 +46,6 @@ import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
 import com.ch4k4uw.workout.egym.state.AppState
-import com.google.accompanist.insets.navigationBarsPadding
 
 @ExperimentalUnitApi
 @Composable
@@ -92,8 +91,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = AppTheme.colors.material.surface)
-            .navigationBarsPadding(),
+            .background(color = AppTheme.colors.material.surface),
         contentAlignment = Alignment.BottomCenter
     ) {
         Box(

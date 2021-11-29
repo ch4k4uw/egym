@@ -1,8 +1,11 @@
-package com.ch4k4uw.workout.egym.home
+package com.ch4k4uw.workout.egym.exercise
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -10,7 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -18,41 +21,38 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
+import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
+import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
-import com.ch4k4uw.workout.egym.extensions.asSuccess
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
-import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
-import com.ch4k4uw.workout.egym.home.interaction.HomeIntent
-import com.ch4k4uw.workout.egym.home.interaction.HomeState
+import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
+import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
+import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.state.AppState
 import com.google.accompanist.insets.statusBarsPadding
 
 @ExperimentalUnitApi
 @Composable
-fun HomeScreen(
-    uiState: State<AppState<HomeState>>,
-    onIntent: (HomeIntent) -> Unit = {},
+fun ExerciseListScreen(
+    uiState: State<AppState<ExerciseListState>>,
+    onIntent: (ExerciseListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
-    var userName by remember { mutableStateOf("") }
-    uiState.asSuccess()?.also { state ->
-        when (state.content) {
-            is HomeState.DisplayUserData -> userName = state.content.user.name
-            else -> Unit
-        }
-    }
+    var userData by remember { mutableStateOf(UserView.Empty) }
+    var isProfileDialogShowing by remember { mutableStateOf(false) }
 
     uiState.raiseEvent().handleSuccess {
         when (content) {
-            is HomeState.ShowLoginScreen -> onLoggedOut()
-            else -> Unit
+            is ExerciseListState.DisplayUserData -> userData = content.user
+            is ExerciseListState.ShowLoginScreen -> onLoggedOut()
         }
     }
 
@@ -67,10 +67,8 @@ fun HomeScreen(
                         .statusBarsPadding(),
                     title = {
                         Text(
-                            text = stringResource(
-                                id = R.string.home_screen_label,
-                                userName
-                            )
+                            text = stringResource(id = R.string.exercise_list_title),
+                            style = AppTheme.typography.material.h6
                         )
                     },
                     navigationIcon = {
@@ -79,8 +77,16 @@ fun HomeScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { onIntent(HomeIntent.PerformLogout) }) {
-                            Icon(imageVector = Icons.Filled.Logout, contentDescription = "")
+                        IconButton(onClick = { isProfileDialogShowing = true }) {
+                            RemoteIcon(
+                                url = userData.image,
+                                default = Icons.Filled.Person,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .padding(all = 4.dp)
+                                    .clip(CircleShape)
+                                    .background(color = AppTheme.colors.material.onPrimary)
+                            )
                         }
                     }
                 )
@@ -88,7 +94,15 @@ fun HomeScreen(
             content = {
             }
         )
-        ContentLoadingProgressBar(visible = uiState.isLoading)
+        if (isProfileDialogShowing) {
+            ProfileDialog(
+                image = userData.image,
+                name = userData.name,
+                email = userData.email,
+                onDismissRequest = { isProfileDialogShowing = false },
+                onLogout = { onIntent(ExerciseListIntent.PerformLogout) }
+            )
+        }
     }
 }
 
@@ -97,7 +111,7 @@ fun HomeScreen(
 @Composable
 fun PreviewDarkScreen() {
     AppTheme {
-        HomeScreen(
+        ExerciseListScreen(
             uiState = remember { mutableStateOf(AppState.Loading()) }
         )
     }
@@ -108,7 +122,7 @@ fun PreviewDarkScreen() {
 @Composable
 fun PreviewLightScreen() {
     AppTheme {
-        HomeScreen(
+        ExerciseListScreen(
             uiState = remember { mutableStateOf(AppState.Loading()) }
         )
     }

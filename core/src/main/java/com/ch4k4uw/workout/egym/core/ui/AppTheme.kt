@@ -14,16 +14,16 @@ import com.ch4k4uw.workout.egym.core.ui.typography.TypographyConstants
 import com.google.accompanist.insets.ProvideWindowInsets
 
 @ExperimentalUnitApi
-val LocalAppTypography = staticCompositionLocalOf {
+private val LocalAppTypography = staticCompositionLocalOf {
     AppTypography(material = TypographyConstants.Normal.material)
 }
-val LocalAppShapes = staticCompositionLocalOf {
+private val LocalAppShapes = staticCompositionLocalOf {
     AppShapes(material = ShapeConstants.Normal.material)
 }
-val LocalAppColors = staticCompositionLocalOf<AppColors> {
+private val LocalAppColors = staticCompositionLocalOf<AppColors> {
     TODO("Undefined")
 }
-val LocalAppShapeCornerDimens = staticCompositionLocalOf<AppDimens.ShapeCorner> {
+private val LocalAppShapeCornerDimens = staticCompositionLocalOf<AppDimens.ShapeCorner> {
     TODO("Undefined")
 }
 
