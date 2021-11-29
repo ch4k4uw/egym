@@ -30,10 +30,11 @@ import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
 import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.extensions.handleSuccess
-import com.ch4k4uw.workout.egym.extensions.raiseEvent
+import com.ch4k4uw.workout.egym.core.ui.components.ListLoadingShimmer1
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
+import com.ch4k4uw.workout.egym.extensions.handleSuccess
+import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.state.AppState
 import com.google.accompanist.insets.statusBarsPadding
@@ -46,13 +47,21 @@ fun ExerciseListScreen(
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
+    val uiStateValue = uiState.value
     var userData by remember { mutableStateOf(UserView.Empty) }
     var isProfileDialogShowing by remember { mutableStateOf(false) }
 
-    uiState.raiseEvent().handleSuccess {
+    uiStateValue.handleSuccess {
         when (content) {
             is ExerciseListState.DisplayUserData -> userData = content.user
+            else -> Unit
+        }
+    }
+
+    uiState.raiseEvent().handleSuccess {
+        when (content) {
             is ExerciseListState.ShowLoginScreen -> onLoggedOut()
+            else -> Unit
         }
     }
 
@@ -92,6 +101,11 @@ fun ExerciseListScreen(
                 )
             },
             content = {
+                if(uiStateValue is AppState.Loading<*>) {
+                    if(uiStateValue.tag is ExerciseListState.ExerciseListTag) {
+                        ListLoadingShimmer1()
+                    }
+                }
             }
         )
         if (isProfileDialogShowing) {

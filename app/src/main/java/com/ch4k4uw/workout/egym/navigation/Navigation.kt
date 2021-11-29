@@ -19,9 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.exercise.ExerciseListScreen
 import com.ch4k4uw.workout.egym.exercise.ExerciseListViewModel
+import com.ch4k4uw.workout.egym.extensions.CollectEachState
+import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.login.LoginScreen
 import com.ch4k4uw.workout.egym.login.LoginViewModel
 import com.ch4k4uw.workout.egym.state.AppState
@@ -47,7 +48,7 @@ fun Navigation() {
         NavHost(navController = navController, startDestination = Screen.Login.route) {
             composable(route = Screen.Login.route) { navBackStackEntry ->
                 val viewModel: LoginViewModel = navBackStackEntry.viewModel()
-                Box (
+                Box(
                     modifier = Modifier
                         .navigationBarsPadding()
                 ) {
@@ -84,31 +85,32 @@ fun Navigation() {
                 ) { navBackStackEntry ->
                     val viewModel: ExerciseListViewModel = navBackStackEntry.viewModel()
                     val backPressOwner = LocalOnBackPressedDispatcherOwner.current
-                    Box(
-                        modifier = Modifier
-                            .padding(
-                                PaddingValues(bottom = paddingValues.calculateBottomPadding())
-                            )
-                    ) {
-                        ExerciseListScreen(
-                            uiState = viewModel.uiState.collectAsState(initial = AppState.Idle()),
-                            onIntent = viewModel::performIntent,
-                            onLoggedOut = {
-                                navController
-                                    .navigate(route = Screen.Login.route) {
-                                        popUpTo(
-                                            route = navBackStackEntry.destination.route ?: ""
-                                        ) {
-                                            inclusive = true
+                    viewModel.uiState.CollectEachState { uiState ->
+                        Box(
+                            modifier = Modifier
+                                .padding(
+                                    PaddingValues(bottom = paddingValues.calculateBottomPadding())
+                                )
+                        ) {
+                            ExerciseListScreen(
+                                uiState = uiState,
+                                onIntent = viewModel::performIntent,
+                                onLoggedOut = {
+                                    navController
+                                        .navigate(route = Screen.Login.route) {
+                                            popUpTo(
+                                                route = navBackStackEntry.destination.route ?: ""
+                                            ) {
+                                                inclusive = true
+                                            }
                                         }
-                                    }
-                            },
-                            onNavigateBack = {
-                                backPressOwner?.onBackPressedDispatcher?.onBackPressed()
-                            }
-                        )
+                                },
+                                onNavigateBack = {
+                                    backPressOwner?.onBackPressedDispatcher?.onBackPressed()
+                                }
+                            )
+                        }
                     }
-
                     val barColor = AppTheme.colors.material.primaryVariant
                     SideEffect {
                         systemUiController.setSystemBarsColor(
