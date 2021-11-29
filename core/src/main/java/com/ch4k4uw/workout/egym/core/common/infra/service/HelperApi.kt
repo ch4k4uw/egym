@@ -17,6 +17,7 @@ interface HelperApi {
     ): ExerciseHeadPagerRemote
 
     @GET("exercise/head")
+    @Headers("authorization: ${BuildConfig.API_AUTH}")
     suspend fun findNextExerciseHeadPage(
         @Query("sz") pageSize: Int,
         @Query("cc") collectionCount: Int,

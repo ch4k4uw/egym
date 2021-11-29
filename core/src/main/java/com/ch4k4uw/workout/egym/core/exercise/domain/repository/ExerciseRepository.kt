@@ -6,7 +6,7 @@ import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import kotlinx.coroutines.flow.Flow
 
 interface ExerciseRepository {
-    suspend fun findHeads(
+    suspend fun findHeadsPager(
         query: String = "",
         tags: List<ExerciseTag> = listOf(),
         options: ExercisePagerOptions = ExercisePagerOptions.Default

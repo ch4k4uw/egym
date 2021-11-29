@@ -89,6 +89,7 @@ dependencies {
 
     implementation(Libraries.AndroidX.Ktx.Core)
     implementation(Libraries.AndroidX.AppCompat)
+    implementation(Libraries.AndroidX.Palette)
     implementation(Libraries.Google.Material)
     implementation(Libraries.Compose.Navigation)
     implementation(Libraries.Compose.Annotation)

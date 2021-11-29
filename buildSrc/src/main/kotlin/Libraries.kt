@@ -35,6 +35,7 @@ object Libraries {
             const val Core = "androidx.core:core-ktx:${Versions.AndroidX.Ktx.Core}"
         }
         const val AppCompat = "androidx.appcompat:appcompat:${Versions.AndroidX.AppCompat}"
+        const val Palette = "androidx.palette:palette:${Versions.AndroidX.Palette}"
     }
     object Google {
         const val Material = "com.google.android.material:material:${Versions.Google.Material}"

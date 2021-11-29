@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
@@ -27,7 +28,8 @@ fun ShimmerCardListItem1(
     yShimmer: Float,
     cardHeight: Dp,
     gradientWidth: Float,
-    padding: Dp
+    padding: Dp,
+    onSideEffect: () -> Unit = {}
 ) {
     val brush = linearGradient(
         colors,
@@ -59,7 +61,9 @@ fun ShimmerCardListItem1(
             )
         }
     }
-
+    SideEffect {
+        onSideEffect()
+    }
 }
 
 @ExperimentalUnitApi
