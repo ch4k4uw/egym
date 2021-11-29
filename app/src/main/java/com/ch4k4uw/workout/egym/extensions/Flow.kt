@@ -1,9 +1,7 @@
 package com.ch4k4uw.workout.egym.extensions
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
