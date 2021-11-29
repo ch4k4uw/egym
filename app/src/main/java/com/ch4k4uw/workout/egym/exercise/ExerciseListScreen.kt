@@ -51,15 +51,9 @@ fun ExerciseListScreen(
     var userData by remember { mutableStateOf(UserView.Empty) }
     var isProfileDialogShowing by remember { mutableStateOf(false) }
 
-    uiStateValue.handleSuccess {
-        when (content) {
-            is ExerciseListState.DisplayUserData -> userData = content.user
-            else -> Unit
-        }
-    }
-
     uiState.raiseEvent().handleSuccess {
         when (content) {
+            is ExerciseListState.DisplayUserData -> userData = content.user
             is ExerciseListState.ShowLoginScreen -> onLoggedOut()
             else -> Unit
         }
