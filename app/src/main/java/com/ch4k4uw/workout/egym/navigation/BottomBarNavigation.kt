@@ -31,7 +31,7 @@ fun BottomBarNavigation(
     navController: NavHostController,
     show: State<Boolean>,
     screens: List<Screen>,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (State<PaddingValues>, BottomBarNavigationController) -> Unit
 ) {
     val bottomBarProperties = object {
         private var offset by remember { mutableStateOf(0.dp) }
@@ -52,12 +52,14 @@ fun BottomBarNavigation(
         }
     }
 
+    var enableNavigation by remember { mutableStateOf(true) }
+
     Scaffold(
         bottomBar = {
             BottomNavigation(
                 modifier = Modifier
-                    .absoluteOffset(y = bottomBarProperties.floatAnimation)
                     .navigationBarsPadding()
+                    .absoluteOffset(y = bottomBarProperties.floatAnimation)
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currDestination = navBackStackEntry?.destination
@@ -71,10 +73,20 @@ fun BottomBarNavigation(
                                 )
                             },
                             label = { Text(text = stringResource(id = screen.label)) },
-                            selected = currDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            selected = currDestination?.hierarchy?.any {
+                                it.route == screen.route
+                            } == true,
+                            enabled = enableNavigation,
                             onClick = {
                                 navController.navigate(screen.route) {
-                                    popUpTo(id = navController.graph.findStartDestination().id) {
+                                    popUpTo(
+                                        route = screen.parent?.route
+                                            ?: navController
+                                                .graph
+                                                .findStartDestination()
+                                                .route
+                                                .orEmpty()
+                                    ) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
@@ -84,7 +96,6 @@ fun BottomBarNavigation(
                         )
                     }
                 }
-
             }
         }
     ) { paddingValues ->
@@ -95,10 +106,18 @@ fun BottomBarNavigation(
             bottomBarProperties
                 .setTo(paddingValues.calculateBottomPadding())
         }
+        val bottomBarNavController = remember {
+            BottomBarNavigationController { enable ->
+                enableNavigation = enable
+            }
+        }
+        val paddingValuesState = remember { mutableStateOf(paddingValues) }
+        paddingValuesState.value = PaddingValues(
+            bottom = paddingValues.calculateBottomPadding() - bottomBarProperties.floatAnimation
+        )
         content(
-            PaddingValues(
-                bottom = paddingValues.calculateBottomPadding() - bottomBarProperties.floatAnimation
-            )
+            paddingValuesState,
+            bottomBarNavController
         )
     }
 }

@@ -21,4 +21,9 @@ object DimensConstants {
             cardMarginBottom = 8.dp
         )
     }
+    object ExerciseListTopAppBar {
+        val normal = EGymDimens.ExerciseListTopAppBar(
+            profileIconPadding = 4.dp
+        )
+    }
 }

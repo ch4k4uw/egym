@@ -40,7 +40,7 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 
 @ExperimentalUnitApi
 @Composable
-fun ExerciseHeadCard(
+fun ExerciseListHeadCard(
     imageUrl: String,
     title: String,
     placeHolderImage: ImageVector = Icons.Filled.Image,

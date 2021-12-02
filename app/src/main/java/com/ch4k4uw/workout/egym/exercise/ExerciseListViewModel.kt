@@ -12,15 +12,20 @@ import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import com.ch4k4uw.workout.egym.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class ExerciseListViewModel @Inject constructor(
     private val exerciseListInteractor: ExerciseListInteractor
@@ -31,9 +36,22 @@ class ExerciseListViewModel @Inject constructor(
     private var exerciseHeadPager: ExerciseHeadPager? = null
     private val exerciseHeadList = mutableListOf<ExerciseHead>()
 
+    private val queryChannel = Channel<String>()
+    private val queryFlow = flow {
+        for (query in queryChannel) {
+            val text = queryChannel.tryReceive().getOrNull() ?: query
+            emit(text)
+        }
+    }.debounce(500)
+
     init {
         viewModelScope.launch {
             emit(AppState.Loading())
+            launch {
+                queryFlow.collect {
+                    findExercisesHeadsPager(query = it)
+                }
+            }
             exerciseListInteractor
                 .findLoggedUser()
                 .catch {
@@ -47,7 +65,7 @@ class ExerciseListViewModel @Inject constructor(
                         emitSuccess(
                             value = ExerciseListState.DisplayUserData(user = it.toView())
                         )
-                        findExercisesHeadsPager()
+                        queryChannel.send("")
                     }
                 }
         }
@@ -56,27 +74,25 @@ class ExerciseListViewModel @Inject constructor(
     private suspend fun <T : AppState<ExerciseListState>> emit(value: T) =
         mutableUiState.emit(value)
 
-    private suspend fun emitError(cause: Throwable) =
-        emit(AppState.Error(cause))
-
-    private suspend fun <T : ExerciseListState> emitSuccess(value: T) =
-        emit(AppState.Success(value))
-
-    private suspend fun findExercisesHeadsPager() {
+    private var isLoading = false
+    private suspend fun findExercisesHeadsPager(query: String) {
         try {
-            exerciseListInteractor
-                .findExercisesHeadsPager()
-                .single()
-                .also { pager ->
-                    exerciseHeadPager = pager
-                }
-            loadNextPage()
+            viewModelScope.launch {
+                while (isLoading) yield()
+                exerciseListInteractor
+                    .findExercisesHeadsPager(query = query)
+                    .single()
+                    .also { pager ->
+                        exerciseHeadPager = pager
+                    }
+                exerciseHeadList.clear()
+                loadNextPage()
+            }
         } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
 
-    private var isLoading = false
     private fun loadNextPage() {
         exerciseHeadPager?.also { pager ->
             viewModelScope.launch {
@@ -113,10 +129,21 @@ class ExerciseListViewModel @Inject constructor(
         }
     }
 
+    private suspend fun emitError(cause: Throwable) =
+        emit(AppState.Error(cause))
+
+    private suspend fun <T : ExerciseListState> emitSuccess(value: T) =
+        emit(AppState.Success(value))
+
+    private fun performQuery(query: String = "") {
+        queryChannel.trySend(query)
+    }
+
     fun performIntent(intent: ExerciseListIntent) {
         when (intent) {
             is ExerciseListIntent.PerformLogout -> performLogout()
             is ExerciseListIntent.FetchNextPage -> loadNextPage()
+            is ExerciseListIntent.PerformQuery -> performQuery(query = intent.query)
         }
     }
 

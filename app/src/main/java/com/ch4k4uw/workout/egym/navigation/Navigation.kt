@@ -11,9 +11,12 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.navigation.NavGraph
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,8 +30,12 @@ import com.ch4k4uw.workout.egym.login.LoginScreen
 import com.ch4k4uw.workout.egym.login.LoginViewModel
 import com.ch4k4uw.workout.egym.state.AppState
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalComposeUiApi
 @SuppressLint("UnrememberedMutableState")
 @ExperimentalUnitApi
 @Composable
@@ -41,11 +48,14 @@ fun Navigation() {
         navController = navController,
         show = showBottomNavigator,
         screens = listOf(
-            Screen.Home.ExerciseList,
-            Screen.Home.ExercisePlans
-        )
-    ) { paddingValues ->
-        NavHost(navController = navController, startDestination = Screen.Login.route) {
+            Screen.Home.Exercise,
+            Screen.Home.Plan
+        ),
+    ) { paddingValues, bottomBarNavController ->
+        NavHost(
+            navController = navController,
+            startDestination = navController.tryGraph()?.startDestinationRoute ?: Screen.Login.route
+        ) {
             composable(route = Screen.Login.route) { navBackStackEntry ->
                 val viewModel: LoginViewModel = navBackStackEntry.viewModel()
                 Box(
@@ -56,6 +66,9 @@ fun Navigation() {
                         uiState = viewModel.uiState.collectAsState(initial = AppState.Idle()),
                         onIntent = viewModel::performIntent,
                         onSuccessfulLoggedIn = {
+                            navController.graph.setStartDestination(
+                                startDestRoute = Screen.Home.route
+                            )
                             navController.navigate(
                                 route = Screen.Home.route
                             ) {
@@ -78,48 +91,72 @@ fun Navigation() {
             }
             navigation(
                 route = Screen.Home.route,
-                startDestination = Screen.Home.ExerciseList.route
+                startDestination = Screen.Home.Exercise.route
             ) {
-                composable(
-                    route = Screen.Home.ExerciseList.route
-                ) { navBackStackEntry ->
-                    val viewModel: ExerciseListViewModel = navBackStackEntry.viewModel()
-                    val backPressOwner = LocalOnBackPressedDispatcherOwner.current
-                    viewModel.uiState.CollectEachState { uiState ->
-                        Box(
-                            modifier = Modifier
-                                .padding(
-                                    PaddingValues(bottom = paddingValues.calculateBottomPadding())
-                                )
-                        ) {
-                            ExerciseListScreen(
-                                uiState = uiState,
-                                onIntent = viewModel::performIntent,
-                                onLoggedOut = {
-                                    navController
-                                        .navigate(route = Screen.Login.route) {
-                                            popUpTo(
-                                                route = navBackStackEntry.destination.route ?: ""
-                                            ) {
-                                                inclusive = true
+                navigation(
+                    route = Screen.Home.Exercise.route,
+                    startDestination = Screen.Home.Exercise.List.route
+                ) {
+                    composable(
+                        route = Screen.Home.Exercise.List.route
+                    ) { navBackStackEntry ->
+                        val viewModel: ExerciseListViewModel = navBackStackEntry.viewModel()
+                        val backPressOwner = LocalOnBackPressedDispatcherOwner.current
+                        viewModel.uiState.CollectEachState { uiState ->
+                            Box(
+                                modifier = Modifier
+                                    .statusBarsPadding()
+                                    .padding(
+                                        PaddingValues(bottom = paddingValues.value.calculateBottomPadding())
+                                    )
+                            ) {
+                                ExerciseListScreen(
+                                    uiState = uiState,
+                                    onIntent = viewModel::performIntent,
+                                    onLoggedOut = {
+                                        navController
+                                            .navigate(route = Screen.Login.route) {
+                                                popUpTo(
+                                                    route = navBackStackEntry.destination.route
+                                                        ?: ""
+                                                ) {
+                                                    inclusive = true
+                                                }
                                             }
-                                        }
-                                },
-                                onNavigateBack = {
-                                    backPressOwner?.onBackPressedDispatcher?.onBackPressed()
-                                }
+                                    },
+                                    onNavigateBack = {
+                                        backPressOwner?.onBackPressedDispatcher?.onBackPressed()
+                                    },
+                                    onNavigationStateChanged = { enable ->
+                                        bottomBarNavController.enableNavigation(enable = enable)
+                                    }
+                                )
+                            }
+                        }
+                        val barColor = AppTheme.colors.material.primaryVariant
+                        SideEffect {
+                            systemUiController.setSystemBarsColor(
+                                color = barColor
                             )
+                            showBottomNavigator.value = true
                         }
                     }
-                    val barColor = AppTheme.colors.material.primaryVariant
-                    SideEffect {
-                        systemUiController.setSystemBarsColor(
-                            color = barColor
-                        )
-                        showBottomNavigator.value = true
+                }
+                navigation(
+                    route = Screen.Home.Plan.route,
+                    startDestination = Screen.Home.Plan.List.route
+                ) {
+                    composable(route = Screen.Home.Plan.List.route) { navBackStackEntry ->
                     }
                 }
             }
         }
     }
 }
+
+fun NavHostController.tryGraph(): NavGraph? =
+    try {
+        graph
+    } catch (e: Throwable) {
+        null
+    }

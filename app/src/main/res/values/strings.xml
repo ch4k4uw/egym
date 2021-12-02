@@ -6,6 +6,10 @@
     <string name="navigation_exercise_plans_label">Plans</string>
 
     <string name="exercise_list_title">Exercises</string>
+    <string name="exercise_list_top_search_bar_clear_icon_description">Clear Text</string>
+    <string name="exercise_list_top_search_bar_search_icon_description">Search Icon</string>
+    <string name="exercise_list_top_search_bar_search_placeholder">Search</string>
+
     <string name="exercise_plans_title">Plans</string>
 
     <string name="profile_dialog_exit_button_label">Exit</string>

@@ -16,4 +16,7 @@ sealed class EGymDimens {
         val titleMarginTop: Dp,
         val cardMarginBottom: Dp
     ) : EGymDimens()
+    data class ExerciseListTopAppBar(
+        val profileIconPadding: Dp
+    ) : EGymDimens()
 }

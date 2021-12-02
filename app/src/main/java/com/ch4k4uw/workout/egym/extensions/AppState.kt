@@ -28,3 +28,6 @@ fun <T> AppState<T>.handleError(handler: AppState.Error<T>.() -> Unit) {
 
 fun <T> AppState<T>.asError(): AppState.Error<T>? =
     (this as? AppState.Error<T>)
+
+fun <T> AppState<T>.asLoading(): AppState.Loading<T>? =
+    (this as? AppState.Loading<T>)

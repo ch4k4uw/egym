@@ -7,19 +7,34 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ch4k4uw.workout.egym.R
 
-sealed class Screen(val route: String, @StringRes val label: Int = 0, val icon: ImageVector? = null) {
+sealed class Screen(
+    val route: String,
+    @StringRes val label: Int = 0,
+    val icon: ImageVector? = null,
+    val parent: Screen? = null
+) {
     object Login : Screen(route = "login")
     object Home : Screen(route = "home") {
-        object ExerciseList : Screen(
-                route = "exercise/list",
-                label = R.string.navigation_exercise_list_label,
-                icon = Icons.Filled.FitnessCenter
+        object Exercise : Screen(
+            route = "home/exercise",
+            label = R.string.navigation_exercise_list_label,
+            icon = Icons.Filled.FitnessCenter,
+            parent = Home
+        ) {
+            object List : Screen(
+                route = "home/exercise/list"
             )
+        }
 
-        object ExercisePlans : Screen(
-            route = "exercise/plan/list",
+        object Plan : Screen(
+            route = "home/plan",
             label = R.string.navigation_exercise_plans_label,
-            icon = Icons.Filled.Assignment
-        )
+            icon = Icons.Filled.Assignment,
+            parent = Home
+        ) {
+            object List : Screen(
+                route = "home/plan/list"
+            )
+        }
     }
 }

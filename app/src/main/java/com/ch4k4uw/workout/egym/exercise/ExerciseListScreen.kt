@@ -1,70 +1,96 @@
 package com.ch4k4uw.workout.egym.exercise
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
+import android.os.Bundle
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.dp
-import com.ch4k4uw.workout.egym.R
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
-import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ListLoadingShimmer1
 import com.ch4k4uw.workout.egym.core.ui.components.ShimmerCardListItem2
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseHeadCard
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListHeadCard
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopAppBar
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopSearchBar
+import com.ch4k4uw.workout.egym.extensions.asLoading
 import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
+import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.state.AppState
-import com.google.accompanist.insets.statusBarsPadding
 
+private object SearchBarAnimationConstants {
+    private const val MinXScale = .9f
+    private const val MinYScale = .5f
+    private const val MinCornerSize = 10f
+
+    fun calculateXScale(scale: Float) = (1f - MinXScale) - ((1f - MinXScale) * scale)
+    fun calculateYScale(scale: Float) = (1f - MinYScale) - ((1f - MinYScale) * scale)
+    fun calculateCornerSize(scale: Float) = MinCornerSize - (MinCornerSize * scale)
+}
+
+@ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @Composable
 fun ExerciseListScreen(
     uiState: State<AppState<ExerciseListState>>,
     onIntent: (ExerciseListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigationStateChanged: (enable: Boolean) -> Unit = {}
 ) {
-    val uiStateValue = uiState.value
-    var userData by remember { mutableStateOf(UserView.Empty) }
-    var isProfileDialogShowing by remember { mutableStateOf(false) }
-    var exercisesHeads by remember { mutableStateOf(listOf<ExerciseHeadView>()) }
-    var showShimmer by remember { mutableStateOf(true) }
+    var userData by rememberSaveable { mutableStateOf(UserView.Empty) }
+    var isProfileDialogShowing by rememberSaveable { mutableStateOf(false) }
+    val exercisesHeads = rememberSaveable(saver = exerciseHeadListSaver()) {
+        mutableStateListOf()
+    }
+    var showShimmer by rememberSaveable { mutableStateOf(true) }
+    var queryText by rememberSaveable { mutableStateOf("") }
+    var isLoadingStateForced by rememberSaveable { mutableStateOf(false) }
+    var isResetQueryRequired by rememberSaveable { mutableStateOf(false) }
+
+    if (uiState.isLoading) {
+        isLoadingStateForced = false
+    }
 
     uiState.raiseEvent().apply {
+        if (this !is AppState.Idle<*>) {
+            onNavigationStateChanged(this !is AppState.Loading<*>)
+        }
         handleSuccess {
             when (content) {
                 is ExerciseListState.DisplayUserData -> userData = content.user
                 is ExerciseListState.ShowLoginScreen -> onLoggedOut()
-                is ExerciseListState.ShowExerciseList -> exercisesHeads =
-                    mutableListOf(*content.exercises.toTypedArray())
+                is ExerciseListState.ShowExerciseList -> with(exercisesHeads) {
+                    clear()
+                    addAll(content.exercises)
+                }
                 is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer = false
                 else -> Unit
             }
@@ -80,48 +106,87 @@ fun ExerciseListScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    modifier = Modifier
-                        .statusBarsPadding(),
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.exercise_list_title),
-                            style = AppTheme.typography.material.h6
+                ConstraintLayout {
+                    var searchBarAnimTarget by rememberSaveable { mutableStateOf(0f) }
+                    val searchBarAnim by animateFloatAsState(
+                        targetValue = searchBarAnimTarget,
+                        animationSpec = tween(durationMillis = 300)
+                    )
+                    val (topBar, searchBar) = createRefs()
+
+                    ExerciseListTopAppBar(
+                        modifier = Modifier
+                            .constrainAs(topBar) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            },
+                        queryText = queryText,
+                        profileImage = userData.image,
+                        onNavigateBack = onNavigateBack,
+                        onSearchButtonClick = { searchBarAnimTarget = 1f },
+                        onProfileButtonClick = { isProfileDialogShowing = true }
+                    )
+
+                    if (searchBarAnim > 0f) {
+                        val xAnimFactor = SearchBarAnimationConstants.calculateXScale(searchBarAnim)
+                        val yAnimFactor = SearchBarAnimationConstants.calculateYScale(searchBarAnim)
+                        val animCornerFactor = SearchBarAnimationConstants
+                            .calculateCornerSize(searchBarAnim)
+                        ExerciseListTopSearchBar(
+                            query = queryText,
+                            modifier = Modifier
+                                .constrainAs(searchBar) {
+                                    top.linkTo(topBar.top)
+                                    start.linkTo(topBar.start)
+                                    bottom.linkTo(topBar.bottom)
+                                    end.linkTo(topBar.end)
+                                }
+                                .alpha(alpha = searchBarAnim)
+                                .scale(scaleX = 1 - xAnimFactor, scaleY = 1f - yAnimFactor)
+                                .clip(shape = RoundedCornerShape(size = animCornerFactor)),
+                            onNavigationClick = {
+                                if (isResetQueryRequired) {
+                                    showShimmer = true
+                                    exercisesHeads.clear()
+                                    isLoadingStateForced = true
+                                    isResetQueryRequired = false
+                                    onIntent(ExerciseListIntent.PerformQuery(query = queryText))
+                                }
+                                searchBarAnimTarget = 0f
+                            },
+                            onQueryChanged = {
+                                showShimmer = true
+                                exercisesHeads.clear()
+                                isLoadingStateForced = true
+                                isResetQueryRequired = it != queryText
+                                onIntent(ExerciseListIntent.PerformQuery(query = it))
+                            },
+                            onExecuteSearch = {
+                                queryText = it
+                                searchBarAnimTarget = 0f
+                            }
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { onNavigateBack() }) {
-                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isProfileDialogShowing = true }) {
-                            RemoteIcon(
-                                url = userData.image,
-                                default = Icons.Filled.Person,
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .padding(all = 4.dp)
-                                    .clip(CircleShape)
-                                    .background(color = AppTheme.colors.material.onPrimary)
-                            )
-                        }
                     }
-                )
+                }
             },
             content = {
-                if (uiStateValue is AppState.Loading<*>) {
-                    if (uiStateValue.tag is ExerciseListState.ExerciseListTag) {
+                val uiStateValue = uiState.value
+                if (isLoadingStateForced || uiStateValue is AppState.Loading<*>) {
+                    if (
+                        isLoadingStateForced ||
+                        uiStateValue.asLoading()?.tag is ExerciseListState.ExerciseListTag
+                    ) {
                         if (exercisesHeads.isEmpty()) {
                             ListLoadingShimmer1()
                         }
                     }
                 }
-                if(exercisesHeads.isNotEmpty()) {
+                if (exercisesHeads.isNotEmpty()) {
                     LazyColumn {
                         val exercisesCount = exercisesHeads.size
                         items(count = exercisesCount, key = { exercisesHeads[it].id }) { index ->
-                            ExerciseHeadCard(
+                            ExerciseListHeadCard(
                                 imageUrl = exercisesHeads[index].image,
                                 title = exercisesHeads[index].title
                             )
@@ -150,6 +215,25 @@ fun ExerciseListScreen(
     }
 }
 
+fun exerciseHeadListSaver(): Saver<SnapshotStateList<ExerciseHeadView>, *> =
+    Saver(
+        save = {
+            Bundle().apply {
+                putParcelableArray("exs", it.toTypedArray())
+            }
+        },
+        restore = {
+            (it.getParcelableArray("exs") as? Array<*>)
+                ?.map { item -> item as ExerciseHeadView }
+                ?.let { items ->
+                    mutableStateListOf<ExerciseHeadView>().apply {
+                        addAll(items)
+                    }
+                }
+        }
+    )
+
+@ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -161,6 +245,7 @@ fun PreviewDarkScreen() {
     }
 }
 
+@ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
