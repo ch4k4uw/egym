@@ -32,12 +32,13 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 @Composable
 fun ShimmerCardListItem2(
     padding: Dp = 0.dp,
+    imageHeightScale: Float = .7f,
     onSideEffect: () -> Unit = {}
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val imageHeight = maxWidth * .7f
+        val imageHeight = maxWidth * imageHeightScale
         val cardWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val cardHeightPx = with(LocalDensity.current) { imageHeight.toPx() }
         val gradientWidth: Float = (0.2f * cardHeightPx)

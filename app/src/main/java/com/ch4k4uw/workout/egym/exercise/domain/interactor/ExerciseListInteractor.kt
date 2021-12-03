@@ -8,6 +8,7 @@ import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.exercise.domain.repository.ExerciseRepository
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 @ViewModelScoped
@@ -30,4 +31,7 @@ class ExerciseListInteractor @Inject constructor(
 
     suspend fun findLoggedUser(): Flow<User> =
         userRepository.findLoggedUser()
+
+    suspend fun findExerciseTags(): Flow<List<ExerciseTag>> =
+        flowOf(ExerciseTag.values().toList())
 }

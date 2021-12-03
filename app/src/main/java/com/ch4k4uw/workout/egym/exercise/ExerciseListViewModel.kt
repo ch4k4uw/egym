@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseHeadPager
+import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.exercise.domain.entity.ExerciseHead
 import com.ch4k4uw.workout.egym.exercise.domain.interactor.ExerciseListInteractor
 import com.ch4k4uw.workout.egym.exercise.extensions.toView
@@ -36,7 +37,7 @@ class ExerciseListViewModel @Inject constructor(
     private var exerciseHeadPager: ExerciseHeadPager? = null
     private val exerciseHeadList = mutableListOf<ExerciseHead>()
 
-    private val queryChannel = Channel<String>()
+    private val queryChannel = Channel<Pair<String, List<ExerciseTag>>>()
     private val queryFlow = flow {
         for (query in queryChannel) {
             val text = queryChannel.tryReceive().getOrNull() ?: query
@@ -49,7 +50,7 @@ class ExerciseListViewModel @Inject constructor(
             emit(AppState.Loading())
             launch {
                 queryFlow.collect {
-                    findExercisesHeadsPager(query = it)
+                    findExercisesHeadsPager(query = it.first, tags = it.second)
                 }
             }
             exerciseListInteractor
@@ -59,14 +60,25 @@ class ExerciseListViewModel @Inject constructor(
                     emitError(cause = it)
                     it.printStackTrace()
                 }
-                .collect {
+                .collect { user ->
                     emit(AppState.Loaded())
-                    if (it != User.Empty) {
-                        emitSuccess(
-                            value = ExerciseListState.DisplayUserData(user = it.toView())
-                        )
-                        queryChannel.send("")
+                    val state = if (user != User.Empty) {
+                        queryChannel.send(Pair("", listOf()))
+                        ExerciseListState.DisplayUserData(user = user.toView())
+                    } else {
+                        ExerciseListState.ShowLoginScreen
                     }
+                    emitSuccess(value = state)
+                    exerciseListInteractor
+                        .findExerciseTags()
+                        .catch {
+                            emit(AppState.Loaded())
+                            emitError(cause = it)
+                            it.printStackTrace()
+                        }
+                        .collect { tags ->
+                            emitSuccess(value = ExerciseListState.ShowExerciseTagList(tags = tags))
+                        }
                 }
         }
     }
@@ -75,12 +87,12 @@ class ExerciseListViewModel @Inject constructor(
         mutableUiState.emit(value)
 
     private var isLoading = false
-    private suspend fun findExercisesHeadsPager(query: String) {
+    private suspend fun findExercisesHeadsPager(query: String, tags: List<ExerciseTag>) {
         try {
             viewModelScope.launch {
                 while (isLoading) yield()
                 exerciseListInteractor
-                    .findExercisesHeadsPager(query = query)
+                    .findExercisesHeadsPager(query = query, tags = tags)
                     .single()
                     .also { pager ->
                         exerciseHeadPager = pager
@@ -135,15 +147,17 @@ class ExerciseListViewModel @Inject constructor(
     private suspend fun <T : ExerciseListState> emitSuccess(value: T) =
         emit(AppState.Success(value))
 
-    private fun performQuery(query: String = "") {
-        queryChannel.trySend(query)
+    private fun performQuery(query: String = "", tags: List<ExerciseTag> = listOf()) {
+        queryChannel.trySend(Pair(query, tags))
     }
 
     fun performIntent(intent: ExerciseListIntent) {
         when (intent) {
             is ExerciseListIntent.PerformLogout -> performLogout()
             is ExerciseListIntent.FetchNextPage -> loadNextPage()
-            is ExerciseListIntent.PerformQuery -> performQuery(query = intent.query)
+            is ExerciseListIntent.PerformQuery -> performQuery(
+                query = intent.query, tags = intent.tags
+            )
         }
     }
 

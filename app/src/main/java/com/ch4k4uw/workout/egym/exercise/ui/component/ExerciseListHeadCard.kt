@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
@@ -100,6 +101,7 @@ fun ExerciseListHeadCard(
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = null,
+                                contentScale = ContentScale.FillHeight,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(imageHeight)

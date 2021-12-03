@@ -1,14 +1,6 @@
 package com.ch4k4uw.workout.egym.exercise
 
-import android.content.res.Configuration
 import android.os.Bundle
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -21,38 +13,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
-import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.core.ui.components.ListLoadingShimmer1
-import com.ch4k4uw.workout.egym.core.ui.components.ShimmerCardListItem2
+import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListHeadCard
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopAppBar
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopSearchBar
-import com.ch4k4uw.workout.egym.extensions.asLoading
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListListSlot
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopAppBarSlot
+import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopTagChipBarSlot
 import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.state.AppState
+import kotlin.math.roundToInt
 
-private object SearchBarAnimationConstants {
-    private const val MinXScale = .9f
-    private const val MinYScale = .5f
-    private const val MinCornerSize = 10f
-
-    fun calculateXScale(scale: Float) = (1f - MinXScale) - ((1f - MinXScale) * scale)
-    fun calculateYScale(scale: Float) = (1f - MinYScale) - ((1f - MinYScale) * scale)
-    fun calculateCornerSize(scale: Float) = MinCornerSize - (MinCornerSize * scale)
+private enum class LayoutId {
+    TopBar, Tags, List
 }
 
 @ExperimentalComposeUiApi
@@ -65,18 +50,47 @@ fun ExerciseListScreen(
     onNavigateBack: () -> Unit = {},
     onNavigationStateChanged: (enable: Boolean) -> Unit = {}
 ) {
-    var userData by rememberSaveable { mutableStateOf(UserView.Empty) }
-    var isProfileDialogShowing by rememberSaveable { mutableStateOf(false) }
-    val exercisesHeads = rememberSaveable(saver = exerciseHeadListSaver()) {
-        mutableStateListOf()
+    var topBarHeightPx by rememberSaveable { mutableStateOf(-1) }
+    val toolbarOffsetHeightPx = rememberSaveable { mutableStateOf(0f) }
+    var tagsHeightPx by rememberSaveable { mutableStateOf(-1) }
+    val tagsOffsetHeightPx = rememberSaveable { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            val isConsumedByTags: Boolean
+                get() = tagsOffsetHeightPx.value == 0f ||
+                        tagsOffsetHeightPx.value == -(topBarHeightPx + tagsHeightPx).toFloat()
+
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+
+                val newTagsOffset = tagsOffsetHeightPx.value + delta
+                tagsOffsetHeightPx.value = newTagsOffset
+                    .coerceIn(-(topBarHeightPx + tagsHeightPx).toFloat(), 0f)
+
+                val newToolbarOffset = tagsOffsetHeightPx.value + tagsHeightPx.toFloat() + delta
+                toolbarOffsetHeightPx.value = newToolbarOffset
+                    .coerceIn(-topBarHeightPx.toFloat(), 0f)
+
+                return if (isConsumedByTags) {
+                    Offset.Zero
+                } else {
+                    available
+                }
+            }
+        }
     }
-    var showShimmer by rememberSaveable { mutableStateOf(true) }
-    var queryText by rememberSaveable { mutableStateOf("") }
-    var isLoadingStateForced by rememberSaveable { mutableStateOf(false) }
-    var isResetQueryRequired by rememberSaveable { mutableStateOf(false) }
+
+    val userData = rememberSaveable { mutableStateOf(UserView.Empty) }
+    val isProfileDialogShowing = rememberSaveable { mutableStateOf(false) }
+    val exercisesHeads = rememberSaveable(saver = exerciseHeadListSaver) { mutableStateListOf() }
+    val exerciseTags = rememberSaveable(saver = exerciseTagListSaver) { mutableStateListOf() }
+    val showShimmer = rememberSaveable { mutableStateOf(true) }
+    val queryText = rememberSaveable { mutableStateOf("") }
+    val isLoadingStateForced = rememberSaveable { mutableStateOf(false) }
+    val isResetQueryRequired = rememberSaveable { mutableStateOf(false) }
 
     if (uiState.isLoading) {
-        isLoadingStateForced = false
+        isLoadingStateForced.value = false
     }
 
     uiState.raiseEvent().apply {
@@ -85,174 +99,145 @@ fun ExerciseListScreen(
         }
         handleSuccess {
             when (content) {
-                is ExerciseListState.DisplayUserData -> userData = content.user
+                is ExerciseListState.DisplayUserData -> userData.value = content.user
                 is ExerciseListState.ShowLoginScreen -> onLoggedOut()
                 is ExerciseListState.ShowExerciseList -> with(exercisesHeads) {
                     clear()
                     addAll(content.exercises)
                 }
-                is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer = false
+                is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer.value = false
+                is ExerciseListState.ShowExerciseTagList -> with(exerciseTags) {
+                    clear()
+                    addAll(content.tags.map { Pair(it, false) })
+                }
                 else -> Unit
             }
         }
         handleError {
-            showShimmer = false
+            showShimmer.value = false
         }
     }
 
-    Box(
+    Layout(
         modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Scaffold(
-            topBar = {
-                ConstraintLayout {
-                    var searchBarAnimTarget by rememberSaveable { mutableStateOf(0f) }
-                    val searchBarAnim by animateFloatAsState(
-                        targetValue = searchBarAnimTarget,
-                        animationSpec = tween(durationMillis = 300)
-                    )
-                    val (topBar, searchBar) = createRefs()
+            .nestedScroll(connection = nestedScrollConnection),
+        content = {
+            ExerciseListTopAppBarSlot(
+                modifier = Modifier.layoutId(layoutId = LayoutId.TopBar),
+                queryText = queryText,
+                exerciseTags = exerciseTags.filter { it.second }.map { it.first },
+                userData = userData,
+                onNavigateBack = onNavigateBack,
+                isProfileDialogShowing = isProfileDialogShowing,
+                isResetQueryRequired = isResetQueryRequired,
+                showShimmer = showShimmer,
+                exercisesHeads = exercisesHeads,
+                isLoadingStateForced = isLoadingStateForced,
+                onIntent = onIntent,
+            )
+            ExerciseListTopTagChipBarSlot(
+                modifier = Modifier
+                    .layoutId(layoutId = LayoutId.Tags),
+                queryText = queryText,
+                exerciseTags = exerciseTags,
+                showShimmer = showShimmer,
+                exercisesHeads = exercisesHeads,
+                isLoadingStateForced = isLoadingStateForced,
+                onIntent = onIntent,
+            )
+            ExerciseListListSlot(
+                modifier = Modifier.layoutId(layoutId = LayoutId.List),
+                uiState = uiState,
+                isLoadingStateForced = isLoadingStateForced,
+                exercisesHeads = exercisesHeads,
+                showShimmer = showShimmer,
+                onIntent = onIntent,
+            )
+        }
+    ) { measure, constraints ->
+        val indexes = hashMapOf<LayoutId, Int>().apply {
+            measure.forEachIndexed { index, measurable ->
+                val id = measurable.layoutId
+                if (id is LayoutId) this[id] = index
+            }
+        }
 
-                    ExerciseListTopAppBar(
-                        modifier = Modifier
-                            .constrainAs(topBar) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            },
-                        queryText = queryText,
-                        profileImage = userData.image,
-                        onNavigateBack = onNavigateBack,
-                        onSearchButtonClick = { searchBarAnimTarget = 1f },
-                        onProfileButtonClick = { isProfileDialogShowing = true }
-                    )
+        val placeable = measure.map { it.measure(constraints = constraints) }
+        val wMax = placeable.maxOf { it.width }
+        val hMax = placeable.maxOf { it.height }
 
-                    if (searchBarAnim > 0f) {
-                        val xAnimFactor = SearchBarAnimationConstants.calculateXScale(searchBarAnim)
-                        val yAnimFactor = SearchBarAnimationConstants.calculateYScale(searchBarAnim)
-                        val animCornerFactor = SearchBarAnimationConstants
-                            .calculateCornerSize(searchBarAnim)
-                        ExerciseListTopSearchBar(
-                            query = queryText,
-                            modifier = Modifier
-                                .constrainAs(searchBar) {
-                                    top.linkTo(topBar.top)
-                                    start.linkTo(topBar.start)
-                                    bottom.linkTo(topBar.bottom)
-                                    end.linkTo(topBar.end)
-                                }
-                                .alpha(alpha = searchBarAnim)
-                                .scale(scaleX = 1 - xAnimFactor, scaleY = 1f - yAnimFactor)
-                                .clip(shape = RoundedCornerShape(size = animCornerFactor)),
-                            onNavigationClick = {
-                                if (isResetQueryRequired) {
-                                    showShimmer = true
-                                    exercisesHeads.clear()
-                                    isLoadingStateForced = true
-                                    isResetQueryRequired = false
-                                    onIntent(ExerciseListIntent.PerformQuery(query = queryText))
-                                }
-                                searchBarAnimTarget = 0f
-                            },
-                            onQueryChanged = {
-                                showShimmer = true
-                                exercisesHeads.clear()
-                                isLoadingStateForced = true
-                                isResetQueryRequired = it != queryText
-                                onIntent(ExerciseListIntent.PerformQuery(query = it))
-                            },
-                            onExecuteSearch = {
-                                queryText = it
-                                searchBarAnimTarget = 0f
-                            }
+        indexes[LayoutId.TopBar]?.run(placeable::get)?.apply {
+            topBarHeightPx = height
+        }
+        indexes[LayoutId.Tags]?.run(placeable::get)?.apply {
+            tagsHeightPx = height
+        }
+
+        layout(width = wMax, height = hMax) {
+            val yTopBar = toolbarOffsetHeightPx.value.roundToInt()
+            val yTags = tagsOffsetHeightPx.value.roundToInt()
+            val placeStack = Array<(() -> Unit)?>(3) { null }
+
+            indexes[LayoutId.TopBar]?.also { topBarIndex ->
+                placeStack[2] = { placeable[topBarIndex].place(x = 0, y = yTopBar) }
+                indexes[LayoutId.Tags]?.also { tagsIndex ->
+                    placeStack[1] = {
+                        placeable[tagsIndex].place(
+                            x = 0,
+                            y = placeable[topBarIndex].height + yTopBar + yTags
                         )
                     }
-                }
-            },
-            content = {
-                val uiStateValue = uiState.value
-                if (isLoadingStateForced || uiStateValue is AppState.Loading<*>) {
-                    if (
-                        isLoadingStateForced ||
-                        uiStateValue.asLoading()?.tag is ExerciseListState.ExerciseListTag
-                    ) {
-                        if (exercisesHeads.isEmpty()) {
-                            ListLoadingShimmer1()
-                        }
-                    }
-                }
-                if (exercisesHeads.isNotEmpty()) {
-                    LazyColumn {
-                        val exercisesCount = exercisesHeads.size
-                        items(count = exercisesCount, key = { exercisesHeads[it].id }) { index ->
-                            ExerciseListHeadCard(
-                                imageUrl = exercisesHeads[index].image,
-                                title = exercisesHeads[index].title
+                    indexes[LayoutId.List]?.also { listIndex ->
+                        placeStack[0] = {
+                            placeable[listIndex].place(
+                                x = 0,
+                                y = placeable[topBarIndex].height + placeable[tagsIndex].height + yTags
                             )
                         }
-                        if (showShimmer) {
-                            item {
-                                ShimmerCardListItem2 {
-                                    onIntent(ExerciseListIntent.FetchNextPage)
-                                }
-                            }
-                        }
-
                     }
                 }
             }
-        )
-        if (isProfileDialogShowing) {
-            ProfileDialog(
-                image = userData.image,
-                name = userData.name,
-                email = userData.email,
-                onDismissRequest = { isProfileDialogShowing = false },
-                onLogout = { onIntent(ExerciseListIntent.PerformLogout) }
-            )
+
+            placeStack.forEach { it?.invoke() }
         }
+    }
+
+    if (isProfileDialogShowing.value) {
+        ProfileDialog(
+            image = userData.value.image,
+            name = userData.value.name,
+            email = userData.value.email,
+            onDismissRequest = { isProfileDialogShowing.value = false },
+            onLogout = { onIntent(ExerciseListIntent.PerformLogout) }
+        )
     }
 }
 
-fun exerciseHeadListSaver(): Saver<SnapshotStateList<ExerciseHeadView>, *> =
+private val exerciseHeadListSaver: Saver<SnapshotStateList<ExerciseHeadView>, *> =
     Saver(
         save = {
-            Bundle().apply {
-                putParcelableArray("exs", it.toTypedArray())
-            }
+            Bundle().apply { putParcelableArray("exs", it.toTypedArray()) }
         },
         restore = {
             (it.getParcelableArray("exs") as? Array<*>)
                 ?.map { item -> item as ExerciseHeadView }
-                ?.let { items ->
-                    mutableStateListOf<ExerciseHeadView>().apply {
-                        addAll(items)
-                    }
-                }
+                ?.let { items -> mutableStateListOf<ExerciseHeadView>().apply { addAll(items) } }
         }
     )
 
-@ExperimentalComposeUiApi
-@ExperimentalUnitApi
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewDarkScreen() {
-    AppTheme {
-        ExerciseListScreen(
-            uiState = remember { mutableStateOf(AppState.Loading()) }
-        )
-    }
-}
-
-@ExperimentalComposeUiApi
-@ExperimentalUnitApi
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Composable
-fun PreviewLightScreen() {
-    AppTheme {
-        ExerciseListScreen(
-            uiState = remember { mutableStateOf(AppState.Loading()) }
-        )
-    }
-}
+private val exerciseTagListSaver: Saver<SnapshotStateList<Pair<ExerciseTag, Boolean>>, *> =
+    Saver(
+        save = {
+            Bundle().apply { putSerializable("tags", it.toTypedArray()) }
+        },
+        restore = {
+            (it.getSerializable("tags") as? Array<*>)
+                ?.let { tags -> tags.map { tag -> tag as Pair<*, *> } }
+                ?.let { tags ->
+                    tags.map { tag -> Pair(tag.first as ExerciseTag, tag.second as Boolean) }
+                }
+                ?.let { tags ->
+                    mutableStateListOf<Pair<ExerciseTag, Boolean>>().apply { addAll(tags) }
+                }
+        }
+    )

@@ -58,6 +58,7 @@ object Libraries {
         const val SysUIController = "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist}"
         const val Insets = "com.google.accompanist:accompanist-insets:${Versions.Accompanist}"
         const val InsetsUi = "com.google.accompanist:accompanist-insets-ui:${Versions.Accompanist}"
+        const val FlowLayout = "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist}"
     }
     object Retrofit {
         const val Retrofit = "com.squareup.retrofit2:retrofit:${Versions.Retrofit}"

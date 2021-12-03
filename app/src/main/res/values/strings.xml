@@ -13,4 +13,18 @@
     <string name="exercise_plans_title">Plans</string>
 
     <string name="profile_dialog_exit_button_label">Exit</string>
+
+    <string name="exercise_tag_back_title">Back</string>
+    <string name="exercise_tag_arms_title">Arms</string>
+    <string name="exercise_tag_shoulders_title">Shoulders</string>
+    <string name="exercise_tag_chest_title">Chest</string>
+    <string name="exercise_tag_legs_title">Legs</string>
+    <string name="exercise_tag_core_title">Core</string>
+    <string name="exercise_tag_abs_title">Abs</string>
+    <string name="exercise_tag_bicep_title">Bicep</string>
+    <string name="exercise_tag_tricep_title">Tricep</string>
+    <string name="exercise_tag_cardio_title">Cardio</string>
+    <string name="exercise_tag_aerobic_title">Aerobic</string>
+    <string name="exercise_tag_anaerobic_title">Anaerobic</string>
+    <string name="exercise_tag_flexibility_title">Flexibility</string>
 </resources>

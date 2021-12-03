@@ -22,12 +22,13 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 @Composable
 fun ListLoadingShimmer1(
     count: Int = 3,
+    imageHeightScale: Float = .7f,
     onItemSideEffect: (index: Int) -> Unit = {}
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val imageHeight = with(LocalDensity.current) { maxWidth * .7f }
+        val imageHeight = maxWidth * imageHeightScale
         val cardWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val cardHeightPx = with(LocalDensity.current) { imageHeight.toPx() }
         val gradientWidth: Float = (0.2f * cardHeightPx)
