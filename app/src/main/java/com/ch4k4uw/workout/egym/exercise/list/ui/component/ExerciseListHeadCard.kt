@@ -1,9 +1,10 @@
-package com.ch4k4uw.workout.egym.exercise.ui.component
+package com.ch4k4uw.workout.egym.exercise.list.ui.component
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -30,8 +31,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -44,16 +45,22 @@ import com.ch4k4uw.workout.egym.core.ui.AppTheme
 fun ExerciseListHeadCard(
     imageUrl: String,
     title: String,
+    onClick: () -> Unit = {},
     placeHolderImage: ImageVector = Icons.Filled.Image,
-    errorImage: ImageVector = Icons.Filled.BrokenImage
+    errorImage: ImageVector = Icons.Filled.BrokenImage,
 ) {
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(role = Role.Button, onClick = onClick)
     ) {
         val imageHeight = maxWidth * EGymTheme.Dimens.exerciseHeadCard.imageHeight
 
         Column {
-            Card(elevation = EGymTheme.Dimens.exerciseHeadCard.cardElevation, shape = RectangleShape) {
+            Card(
+                elevation = EGymTheme.Dimens.exerciseHeadCard.cardElevation,
+                shape = RectangleShape
+            ) {
                 Column {
                     var image by remember { mutableStateOf<Bitmap?>(null) }
                     var error by remember { mutableStateOf(false) }

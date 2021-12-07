@@ -11,4 +11,16 @@ data class Exercise(
     val images: List<String>,
     val created: LocalDateTime = LocalDateTime.now(),
     val updated: LocalDateTime = LocalDateTime.now()
-)
+) {
+    companion object {
+        val Empty = Exercise(
+            id = "",
+            title = "",
+            description = "",
+            tags = listOf(),
+            images = listOf(),
+            created = LocalDateTime.MIN,
+            updated = LocalDateTime.MIN
+        )
+    }
+}

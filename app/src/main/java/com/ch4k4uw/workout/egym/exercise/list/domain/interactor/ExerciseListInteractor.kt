@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.domain.interactor
+package com.ch4k4uw.workout.egym.exercise.list.domain.interactor
 
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.core.auth.domain.repository.UserCmdRepository

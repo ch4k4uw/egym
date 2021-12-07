@@ -1,10 +1,13 @@
 package com.ch4k4uw.workout.egym.core.exercise.infra.data
 
-import com.ch4k4uw.workout.egym.core.BuildConfig
+import android.content.Context
+import com.ch4k4uw.workout.egym.core.R
 import com.google.firebase.firestore.FieldPath
 
 internal object ExerciseConstants {
-    const val Name = BuildConfig.TABLE_EXERCISE
+    fun findTableName(context: Context) =
+        context.getString(R.string.table_exercise)
+
     object Field {
         val id by lazy {
             FieldPath.documentId()

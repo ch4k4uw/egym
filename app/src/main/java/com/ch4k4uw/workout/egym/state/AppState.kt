@@ -6,5 +6,5 @@ sealed class AppState<out T> {
     data class Loaded<out T>(val tag: T? = null) : AppState<T>()
     class LoadCanceled<out T> : AppState<T>()
     data class Success<out T>(val content: T): AppState<T>()
-    data class Error<out T>(val cause: Throwable): AppState<T>()
+    data class Error<out T>(val cause: Throwable, val tag: T? = null): AppState<T>()
 }

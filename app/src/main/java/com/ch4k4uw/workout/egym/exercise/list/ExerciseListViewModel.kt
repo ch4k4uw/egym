@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise
+package com.ch4k4uw.workout.egym.exercise.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,10 +6,10 @@ import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseHeadPager
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.exercise.domain.entity.ExerciseHead
-import com.ch4k4uw.workout.egym.exercise.domain.interactor.ExerciseListInteractor
-import com.ch4k4uw.workout.egym.exercise.extensions.toView
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
+import com.ch4k4uw.workout.egym.exercise.list.domain.interactor.ExerciseListInteractor
+import com.ch4k4uw.workout.egym.exercise.list.extensions.toView
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import com.ch4k4uw.workout.egym.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel

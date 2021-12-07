@@ -65,4 +65,5 @@ object Libraries {
         const val GSonConverter = "com.squareup.retrofit2:converter-gson:${Versions.Retrofit}"
     }
     const val LoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.LoggingInterceptor}"
+    const val Timber = "com.jakewharton.timber:timber:${Versions.Timber}"
 }

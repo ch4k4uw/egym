@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.ui.component
+package com.ch4k4uw.workout.egym.exercise.list.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme

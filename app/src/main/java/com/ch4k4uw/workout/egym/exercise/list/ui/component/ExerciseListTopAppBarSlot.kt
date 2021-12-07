@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.ui.component
+package com.ch4k4uw.workout.egym.exercise.list.ui.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -18,8 +18,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 
 private object SearchBarAnimationConstants {

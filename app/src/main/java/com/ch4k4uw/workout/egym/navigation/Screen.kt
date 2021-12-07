@@ -24,6 +24,12 @@ sealed class Screen(
             object List : Screen(
                 route = "home/exercise/list"
             )
+            object Detail : Screen(
+                route = "home/exercise/detail/{exerciseId}"
+            ) {
+                fun route(exerciseId: String) =
+                    route.replace("{exerciseId}", exerciseId)
+            }
         }
 
         object Plan : Screen(

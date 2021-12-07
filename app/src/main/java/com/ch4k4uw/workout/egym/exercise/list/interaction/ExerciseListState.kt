@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.interaction
+package com.ch4k4uw.workout.egym.exercise.list.interaction
 
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.login.interaction.UserView

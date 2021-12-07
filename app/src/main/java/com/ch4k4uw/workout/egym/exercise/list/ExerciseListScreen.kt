@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise
+package com.ch4k4uw.workout.egym.exercise.list
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
@@ -22,12 +22,12 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListState
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListListSlot
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopAppBarSlot
-import com.ch4k4uw.workout.egym.exercise.ui.component.ExerciseListTopTagChipBarSlot
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
+import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListListSlot
+import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListTopAppBarSlot
+import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListTopTagChipBarSlot
 import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading
@@ -48,7 +48,7 @@ fun ExerciseListScreen(
     onIntent: (ExerciseListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
-    onNavigationStateChanged: (enable: Boolean) -> Unit = {}
+    onExerciseClick: (String) -> Unit = {}
 ) {
     var topBarHeightPx by rememberSaveable { mutableStateOf(-1) }
     val toolbarOffsetHeightPx = rememberSaveable { mutableStateOf(0f) }
@@ -94,9 +94,6 @@ fun ExerciseListScreen(
     }
 
     uiState.raiseEvent().apply {
-        if (this !is AppState.Idle<*>) {
-            onNavigationStateChanged(this !is AppState.Loading<*>)
-        }
         handleSuccess {
             when (content) {
                 is ExerciseListState.DisplayUserData -> userData.value = content.user
@@ -151,6 +148,7 @@ fun ExerciseListScreen(
                 isLoadingStateForced = isLoadingStateForced,
                 exercisesHeads = exercisesHeads,
                 showShimmer = showShimmer,
+                onExerciseClick = onExerciseClick,
                 onIntent = onIntent,
             )
         }

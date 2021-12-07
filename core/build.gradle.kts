@@ -1,5 +1,6 @@
 import extensions.versionSharing
 import extensions.implementation
+import extensions.api
 import extensions.kapt
 import java.util.Properties
 
@@ -78,6 +79,7 @@ dependencies {
     implementation(Libraries.Firebase.Firestore)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
+    api(Libraries.Timber)
 
     //Accompanist
     implementation(Libraries.Accompanist.SysUIController)

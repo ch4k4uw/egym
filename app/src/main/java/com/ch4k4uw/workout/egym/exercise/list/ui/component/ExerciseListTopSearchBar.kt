@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.ui.component
+package com.ch4k4uw.workout.egym.exercise.list.ui.component
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.fillMaxWidth

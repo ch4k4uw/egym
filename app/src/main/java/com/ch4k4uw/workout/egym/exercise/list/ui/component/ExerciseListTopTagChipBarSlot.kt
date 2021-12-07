@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.ui.component
+package com.ch4k4uw.workout.egym.exercise.list.ui.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AppBarDefaults
@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseHeadView
-import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseListIntent
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
+import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.google.accompanist.flowlayout.SizeMode

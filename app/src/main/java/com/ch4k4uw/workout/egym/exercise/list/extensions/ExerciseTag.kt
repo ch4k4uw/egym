@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.extensions
+package com.ch4k4uw.workout.egym.exercise.list.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable

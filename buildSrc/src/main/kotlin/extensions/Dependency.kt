@@ -3,20 +3,23 @@ package extensions
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.project
 
-fun DependencyHandlerScope.implementation(dependecy: String) =
-    add("implementation", dependecy)
+fun DependencyHandlerScope.implementation(dependency: String) =
+    add("implementation", dependency)
 
-fun DependencyHandlerScope.testImplementation(dependecy: String) =
-    add("testImplementation", dependecy)
+fun DependencyHandlerScope.testImplementation(dependency: String) =
+    add("testImplementation", dependency)
 
-fun DependencyHandlerScope.internalModule(dependecy: String) =
-    add("implementation", project(dependecy))
+fun DependencyHandlerScope.internalModule(dependency: String) =
+    add("implementation", project(dependency))
 
-fun DependencyHandlerScope.kapt(dependecy: String) =
-    add("kapt", dependecy)
+fun DependencyHandlerScope.kapt(dependency: String) =
+    add("kapt", dependency)
 
-fun DependencyHandlerScope.internalApi(dependecy: String) =
-    add("api", project(dependecy))
+fun DependencyHandlerScope.internalApi(dependency: String) =
+    add("api", project(dependency))
 
-fun DependencyHandlerScope.versionSharing(dependecy: String) =
-    add("implementation", platform(dependecy))
+fun DependencyHandlerScope.api(dependency: String) =
+    add("api", dependency)
+
+fun DependencyHandlerScope.versionSharing(dependency: String) =
+    add("implementation", platform(dependency))

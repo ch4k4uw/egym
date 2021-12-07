@@ -22,8 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.exercise.ExerciseListScreen
-import com.ch4k4uw.workout.egym.exercise.ExerciseListViewModel
+import com.ch4k4uw.workout.egym.exercise.detail.ExerciseDetailScreen
+import com.ch4k4uw.workout.egym.exercise.detail.ExerciseDetailViewModel
+import com.ch4k4uw.workout.egym.exercise.list.ExerciseListScreen
+import com.ch4k4uw.workout.egym.exercise.list.ExerciseListViewModel
 import com.ch4k4uw.workout.egym.extensions.CollectEachState
 import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.login.LoginScreen
@@ -44,6 +46,7 @@ fun Navigation() {
     val systemUiController = rememberSystemUiController()
     val navController = rememberNavController()
     val showBottomNavigator = remember { mutableStateOf(false) }
+    val backPressOwner = LocalOnBackPressedDispatcherOwner.current
     BottomBarNavigation(
         navController = navController,
         show = showBottomNavigator,
@@ -51,7 +54,7 @@ fun Navigation() {
             Screen.Home.Exercise,
             Screen.Home.Plan
         ),
-    ) { paddingValues, bottomBarNavController ->
+    ) { paddingValues, _ ->
         NavHost(
             navController = navController,
             startDestination = navController.tryGraph()?.startDestinationRoute ?: Screen.Login.route
@@ -101,7 +104,6 @@ fun Navigation() {
                         route = Screen.Home.Exercise.List.route
                     ) { navBackStackEntry ->
                         val viewModel: ExerciseListViewModel = navBackStackEntry.viewModel()
-                        val backPressOwner = LocalOnBackPressedDispatcherOwner.current
                         viewModel.uiState.CollectEachState { uiState ->
                             Box(
                                 modifier = Modifier
@@ -127,8 +129,13 @@ fun Navigation() {
                                     onNavigateBack = {
                                         backPressOwner?.onBackPressedDispatcher?.onBackPressed()
                                     },
-                                    onNavigationStateChanged = { enable ->
-                                        bottomBarNavController.enableNavigation(enable = enable)
+                                    onExerciseClick = {
+                                        navController
+                                            .navigate(
+                                                route = Screen.Home.Exercise.Detail.route(it)
+                                            ) {
+                                                restoreState = true
+                                            }
                                     }
                                 )
                             }
@@ -141,12 +148,36 @@ fun Navigation() {
                             showBottomNavigator.value = true
                         }
                     }
+                    composable(
+                        route = Screen.Home.Exercise.Detail.route
+                    ) { navBackStackEntry ->
+                        val viewModel: ExerciseDetailViewModel = navBackStackEntry.viewModel()
+                        Box(
+                            modifier = Modifier
+                                .statusBarsPadding()
+                                .padding(
+                                    PaddingValues(bottom = paddingValues.value.calculateBottomPadding())
+                                )
+                        ) {
+                            ExerciseDetailScreen(
+                                uiState = viewModel
+                                    .uiState
+                                    .collectAsState(initial = AppState.Idle()),
+                                onShowExerciseList = {
+                                    backPressOwner?.onBackPressedDispatcher?.onBackPressed()
+                                },
+                                onNavigateBack = {
+                                    backPressOwner?.onBackPressedDispatcher?.onBackPressed()
+                                }
+                            )
+                        }
+                    }
                 }
                 navigation(
                     route = Screen.Home.Plan.route,
                     startDestination = Screen.Home.Plan.List.route
                 ) {
-                    composable(route = Screen.Home.Plan.List.route) { navBackStackEntry ->
+                    composable(route = Screen.Home.Plan.List.route) {
                     }
                 }
             }

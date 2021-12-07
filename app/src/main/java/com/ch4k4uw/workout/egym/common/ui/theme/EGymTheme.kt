@@ -30,6 +30,11 @@ private val LocalEGymExerciseListTopTagChipBarSlotDimens =
         TODO("Undefined")
     }
 
+private val LocalEGymExerciseDetailDimens =
+    staticCompositionLocalOf<EGymDimens.ExerciseDetail> {
+        TODO("Undefined")
+    }
+
 @Composable
 fun EGymTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
@@ -38,7 +43,8 @@ fun EGymTheme(content: @Composable () -> Unit) {
         LocalEGymExerciseListTopAppBarDimens provides DimensConstants.ExerciseListTopAppBar.normal,
         LocalEGymExerciseListTagChipDimens provides DimensConstants.ExerciseListTagChip.normal,
         LocalEGymExerciseListTopTagChipBarSlotDimens provides DimensConstants
-            .ExerciseListTopTagChipBarSlot.normal
+            .ExerciseListTopTagChipBarSlot.normal,
+        LocalEGymExerciseDetailDimens provides DimensConstants.ExerciseDetail.normal
     ) {
         content()
     }
@@ -66,5 +72,9 @@ object EGymTheme {
             @ReadOnlyComposable
             @Composable
             get() = LocalEGymExerciseListTopTagChipBarSlotDimens.current
+        val exerciseDetail: EGymDimens.ExerciseDetail
+            @ReadOnlyComposable
+            @Composable
+            get() = LocalEGymExerciseDetailDimens.current
     }
 }

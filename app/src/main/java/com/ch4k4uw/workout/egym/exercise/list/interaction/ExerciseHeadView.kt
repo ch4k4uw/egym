@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.interaction
+package com.ch4k4uw.workout.egym.exercise.list.interaction
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
