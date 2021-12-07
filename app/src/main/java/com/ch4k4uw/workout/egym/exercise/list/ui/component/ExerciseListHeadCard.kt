@@ -58,7 +58,7 @@ fun ExerciseListHeadCard(
 
         Column {
             Card(
-                elevation = EGymTheme.Dimens.exerciseHeadCard.cardElevation,
+                elevation = AppTheme.Dimens.spacing.tiny,
                 shape = RectangleShape
             ) {
                 Column {
@@ -139,12 +139,12 @@ fun ExerciseListHeadCard(
                     }
                     Spacer(
                         modifier = Modifier
-                            .height(EGymTheme.Dimens.exerciseHeadCard.titleMarginTop)
+                            .height(AppTheme.Dimens.spacing.tiny)
                     )
                     Text(text = title, style = AppTheme.typography.material.h6)
                 }
             }
-            Spacer(modifier = Modifier.height(EGymTheme.Dimens.exerciseHeadCard.cardMarginBottom))
+            Spacer(modifier = Modifier.height(AppTheme.Dimens.spacing.xtiny))
         }
     }
 }

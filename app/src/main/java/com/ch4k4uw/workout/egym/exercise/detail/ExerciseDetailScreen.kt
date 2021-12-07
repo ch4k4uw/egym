@@ -218,12 +218,12 @@ fun ExerciseDetailScreen(
                     )
                 }
                 val scrollSate = rememberScrollState()
-                if(!isLoading) {
+                if (!isLoading) {
                     Column(
                         modifier = Modifier
                             .layoutId(LayoutId.Description)
                             .fillMaxSize()
-                            .padding(all = EGymTheme.Dimens.exerciseDetail.descriptionPadding)
+                            .padding(all = AppTheme.Dimens.spacing.xtiny)
                             .verticalScroll(state = scrollSate)
                     ) {
                         Text(
@@ -236,10 +236,7 @@ fun ExerciseDetailScreen(
                         Spacer(
                             modifier = Modifier
                                 .height(
-                                    height = EGymTheme
-                                        .Dimens
-                                        .exerciseDetail
-                                        .descriptionDescriptionBottomPadding
+                                    height = AppTheme.Dimens.spacing.normal
                                 )
                         )
                         Text(
@@ -259,7 +256,7 @@ fun ExerciseDetailScreen(
                         modifier = Modifier
                             .layoutId(LayoutId.DescriptionShimmer)
                             .fillMaxSize()
-                            .padding(all = EGymTheme.Dimens.exerciseDetail.descriptionPadding)
+                            .padding(all = AppTheme.Dimens.spacing.xtiny)
                             .verticalScroll(state = scrollSate)
                     ) {
                         for (i in 0..2) {
@@ -268,10 +265,7 @@ fun ExerciseDetailScreen(
                                     AppTheme.typography.material.h6.fontSize.toDp()
                                 },
                                 width = if (i == 2) {
-                                    EGymTheme
-                                        .Dimens
-                                        .exerciseDetail
-                                        .descriptionShimmerSmallestLineWidth
+                                    AppTheme.Dimens.spacing.xxlarge
                                 } else {
                                     Dp.Unspecified
                                 }
@@ -279,10 +273,7 @@ fun ExerciseDetailScreen(
                             Spacer(
                                 modifier = Modifier
                                     .height(
-                                        height = EGymTheme
-                                            .Dimens
-                                            .exerciseDetail
-                                            .descriptionPadding
+                                        height = AppTheme.Dimens.spacing.xtiny
                                     )
                             )
                         }

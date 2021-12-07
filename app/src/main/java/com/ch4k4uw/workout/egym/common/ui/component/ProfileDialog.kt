@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
-import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 
 @ExperimentalUnitApi
@@ -87,7 +86,7 @@ fun ProfileDialog(
                     Column(
                         modifier = Modifier
                             .padding(
-                                start = EGymTheme.Dimens.profileDialog.dataStartPadding
+                                start = AppTheme.Dimens.spacing.normal
                             )
                     ) {
                         Text(
@@ -102,7 +101,7 @@ fun ProfileDialog(
                 }
                 Spacer(
                     modifier = Modifier
-                        .height(EGymTheme.Dimens.profileDialog.bodyBottomPadding)
+                        .height(AppTheme.Dimens.spacing.tiny)
                 )
             }
         },
@@ -112,16 +111,10 @@ fun ProfileDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = EGymTheme
-                            .Dimens
-                            .profileDialog
-                            .logoutButtonHorizontalPadding
+                        horizontal = AppTheme.Dimens.spacing.xxnormal
                     )
                     .padding(
-                        bottom = EGymTheme
-                            .Dimens
-                            .profileDialog
-                            .logoutButtonBottomPadding
+                        bottom = AppTheme.Dimens.spacing.xxnormal
                     )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -129,10 +122,7 @@ fun ProfileDialog(
                         imageVector = Icons.Outlined.Logout,
                         modifier = Modifier
                             .padding(
-                                end = EGymTheme
-                                    .Dimens
-                                    .profileDialog
-                                    .logoutButtonIconPadding
+                                end = AppTheme.Dimens.spacing.xtiny
                             ),
                         contentDescription = ""
                     )

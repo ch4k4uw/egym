@@ -27,8 +27,8 @@ fun ExerciseListTagChip(
     onTagSelectionChanged: (ExerciseTag, Boolean) -> Unit = { _, _ -> }
 ) {
     Surface(
-        modifier = Modifier.padding(end = EGymTheme.Dimens.exerciseListTagChip.buttonEndPadding),
-        elevation = EGymTheme.Dimens.exerciseListTagChip.elevation,
+        modifier = Modifier.padding(end = AppTheme.Dimens.spacing.xtiny),
+        elevation = AppTheme.Dimens.spacing.xtiny,
         shape = RoundedCornerShape(size = with(LocalDensity.current) {
             MaterialTheme.typography.body2.fontSize.toDp()
         }),
@@ -49,7 +49,7 @@ fun ExerciseListTagChip(
                 text = tag.displayText,
                 style = MaterialTheme.typography.body2,
                 color = AppTheme.colors.material.onSecondary,
-                modifier = Modifier.padding(all = EGymTheme.Dimens.exerciseListTagChip.textPadding)
+                modifier = Modifier.padding(all = AppTheme.Dimens.spacing.xtiny)
             )
         }
     }

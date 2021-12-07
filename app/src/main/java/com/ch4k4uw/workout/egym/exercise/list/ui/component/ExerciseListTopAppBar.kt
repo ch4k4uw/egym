@@ -72,7 +72,7 @@ fun ExerciseListTopAppBar(
                     default = Icons.Filled.Person,
                     contentDescription = "",
                     modifier = Modifier
-                        .padding(all = EGymTheme.Dimens.exerciseListTopAppBar.profileIconPadding)
+                        .padding(all = AppTheme.Dimens.spacing.tiny)
                         .clip(CircleShape)
                         .background(color = AppTheme.colors.material.onPrimary)
                 )

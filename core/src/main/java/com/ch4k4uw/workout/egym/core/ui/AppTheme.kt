@@ -17,13 +17,28 @@ import com.google.accompanist.insets.ProvideWindowInsets
 private val LocalAppTypography = staticCompositionLocalOf {
     AppTypography(material = TypographyConstants.Normal.material)
 }
+
 private val LocalAppShapes = staticCompositionLocalOf {
     AppShapes(material = ShapeConstants.Normal.material)
 }
+
 private val LocalAppColors = staticCompositionLocalOf<AppColors> {
     TODO("Undefined")
 }
+
 private val LocalAppShapeCornerDimens = staticCompositionLocalOf<AppDimens.ShapeCorner> {
+    TODO("Undefined")
+}
+
+private val LocalAppSpacingDimens = staticCompositionLocalOf<AppDimens.Spacing> {
+    TODO("Undefined")
+}
+
+private val LocalAppSizingDimens = staticCompositionLocalOf<AppDimens.Sizing> {
+    TODO("Undefined")
+}
+
+private val LocalAppPaddingDimens = staticCompositionLocalOf<AppDimens.Padding> {
     TODO("Undefined")
 }
 
@@ -34,6 +49,9 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val appShapeCornerDimens = DimensConstants.Shape.normal
+    val appSpacingDimens = DimensConstants.Spacing.normal
+    val appSizingDimens = DimensConstants.Sizing.normal
+    val appPaddingDimens = DimensConstants.Padding.normal
 
     val colors = if (isDark) {
         ColorConstants.DarkColors
@@ -46,6 +64,9 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalAppShapeCornerDimens provides appShapeCornerDimens,
+        LocalAppSpacingDimens provides appSpacingDimens,
+        LocalAppSizingDimens provides appSizingDimens,
+        LocalAppPaddingDimens provides appPaddingDimens,
         LocalAppColors provides colors,
         LocalAppTypography provides typography,
         LocalAppShapes provides shapes
@@ -68,6 +89,21 @@ object AppTheme {
             @ReadOnlyComposable
             @Composable
             get() = LocalAppShapeCornerDimens.current
+
+        val spacing: AppDimens.Spacing
+            @ReadOnlyComposable
+            @Composable
+            get() = LocalAppSpacingDimens.current
+
+        val sizing: AppDimens.Sizing
+            @ReadOnlyComposable
+            @Composable
+            get() = LocalAppSizingDimens.current
+
+        val padding: AppDimens.Padding
+            @ReadOnlyComposable
+            @Composable
+            get() = LocalAppPaddingDimens.current
     }
 
     val colors: AppColors

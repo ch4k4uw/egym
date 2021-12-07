@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import com.ch4k4uw.workout.egym.common.ui.theme.EGymTheme
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
@@ -34,11 +33,11 @@ fun ExerciseListTopTagChipBarSlot(
     ) {
         FlowRow(
             modifier = Modifier
-                .padding(all = EGymTheme.Dimens.exerciseListTopTagChipBarSlot.padding),
+                .padding(all = AppTheme.Dimens.spacing.xtiny),
             mainAxisAlignment = MainAxisAlignment.Center,
             mainAxisSize = SizeMode.Expand,
-            crossAxisSpacing = EGymTheme.Dimens.exerciseListTopTagChipBarSlot.crossAxisSpacing,
-            mainAxisSpacing = EGymTheme.Dimens.exerciseListTopTagChipBarSlot.mainAxisSpacing,
+            crossAxisSpacing = AppTheme.Dimens.spacing.small,
+            mainAxisSpacing = AppTheme.Dimens.spacing.xtiny,
         ) {
             for (tag in exerciseTags) {
                 ExerciseListTagChip(tag = tag.first, isSelected = tag.second) { rawTag, state ->
