@@ -33,7 +33,7 @@ import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 import kotlin.math.roundToInt
 
 private enum class LayoutId {

@@ -45,7 +45,7 @@ import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 
 @ExperimentalUnitApi
 @Composable

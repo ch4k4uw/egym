@@ -8,7 +8,7 @@ import com.ch4k4uw.workout.egym.login.domain.interactor.LoginInteractor
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

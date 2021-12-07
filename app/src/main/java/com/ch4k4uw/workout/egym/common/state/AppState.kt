@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.state
+package com.ch4k4uw.workout.egym.common.state
 
 sealed class AppState<out T> {
     class Idle<out T> : AppState<T>()

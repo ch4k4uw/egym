@@ -1,7 +1,7 @@
 
 package com.ch4k4uw.workout.egym.extensions
 
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 
 val AppState<*>.isLoading: Boolean
     get() = this is AppState.Loading

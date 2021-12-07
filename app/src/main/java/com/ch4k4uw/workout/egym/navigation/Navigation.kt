@@ -30,7 +30,7 @@ import com.ch4k4uw.workout.egym.extensions.CollectEachState
 import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.login.LoginScreen
 import com.ch4k4uw.workout.egym.login.LoginViewModel
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController

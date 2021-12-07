@@ -15,7 +15,7 @@ import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.extensions.asLoading
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 
 @ExperimentalUnitApi
 @Composable

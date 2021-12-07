@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ch4k4uw.workout.egym.core.exercise.domain.repository.ExerciseRepository
 import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseDetailState
 import com.ch4k4uw.workout.egym.exercise.extensions.toView
-import com.ch4k4uw.workout.egym.state.AppState
+import com.ch4k4uw.workout.egym.common.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
