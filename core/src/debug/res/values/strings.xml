@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="table_training_plan">training_plan_dev</string>
+    <string name="table_training_execution">training_plan_execution_dev</string>
+</resources>

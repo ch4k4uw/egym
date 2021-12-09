@@ -1,11 +1,11 @@
 package com.ch4k4uw.workout.egym.navigation
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.exercise.detail.ExerciseDetailScreen
 import com.ch4k4uw.workout.egym.exercise.detail.ExerciseDetailViewModel
@@ -30,15 +31,14 @@ import com.ch4k4uw.workout.egym.extensions.CollectEachState
 import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.login.LoginScreen
 import com.ch4k4uw.workout.egym.login.LoginViewModel
-import com.ch4k4uw.workout.egym.common.state.AppState
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalMaterialApi
 @FlowPreview
 @ExperimentalComposeUiApi
-@SuppressLint("UnrememberedMutableState")
 @ExperimentalUnitApi
 @Composable
 fun Navigation() {
@@ -47,6 +47,7 @@ fun Navigation() {
     val navController = rememberNavController()
     val showBottomNavigator = remember { mutableStateOf(false) }
     val backPressOwner = LocalOnBackPressedDispatcherOwner.current
+
     BottomBarNavigation(
         navController = navController,
         show = showBottomNavigator,
@@ -57,7 +58,8 @@ fun Navigation() {
     ) { paddingValues, _ ->
         NavHost(
             navController = navController,
-            startDestination = navController.tryGraph()?.startDestinationRoute ?: Screen.Login.route
+            startDestination = navController.tryGraph()?.startDestinationRoute
+                ?: Screen.Login.route
         ) {
             composable(route = Screen.Login.route) { navBackStackEntry ->
                 val viewModel: LoginViewModel = navBackStackEntry.viewModel()
@@ -151,7 +153,8 @@ fun Navigation() {
                     composable(
                         route = Screen.Home.Exercise.Detail.route
                     ) { navBackStackEntry ->
-                        val viewModel: ExerciseDetailViewModel = navBackStackEntry.viewModel()
+                        val viewModel: ExerciseDetailViewModel =
+                            navBackStackEntry.viewModel()
                         Box(
                             modifier = Modifier
                                 .statusBarsPadding()
