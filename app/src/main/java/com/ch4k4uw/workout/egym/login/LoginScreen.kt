@@ -46,6 +46,7 @@ import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
 import com.ch4k4uw.workout.egym.common.state.AppState
+import com.google.accompanist.insets.navigationBarsPadding
 
 @ExperimentalUnitApi
 @Composable
@@ -155,6 +156,7 @@ fun LoginScreen(
             SignInGoogleButton(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .height(SocialMediaButtonDefaults.height),
                 onClick = {
                     onIntent(LoginIntent.PerformFirebaseGoogleSignIn)

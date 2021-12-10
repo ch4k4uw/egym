@@ -53,6 +53,7 @@ private val InteractionSaver: Saver<MutableState<ModalBottomSheetAlertResultStat
     }
 )
 
+//region main
 @ExperimentalUnitApi
 @ExperimentalMaterialApi
 @Composable
@@ -92,7 +93,9 @@ fun ModalBottomSheetAlertLayout(
         content = { content(interactionState) }
     )
 }
+//endregion
 
+//region body
 @ExperimentalMaterialApi
 @ExperimentalUnitApi
 @Composable
@@ -207,6 +210,7 @@ private fun SheetContent(
         }
     }
 }
+//endregion
 
 //region Preview
 @TestOnly

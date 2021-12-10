@@ -1,19 +1,29 @@
 package com.ch4k4uw.workout.egym.core.ui
 
+import android.os.Bundle
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.LayoutDirection
 import com.ch4k4uw.workout.egym.core.ui.color.ColorConstants
 import com.ch4k4uw.workout.egym.core.ui.dimens.DimensConstants
 import com.ch4k4uw.workout.egym.core.ui.shape.ShapeConstants
 import com.ch4k4uw.workout.egym.core.ui.typography.TypographyConstants
+import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 
-@ExperimentalUnitApi
 private val LocalAppTypography = staticCompositionLocalOf {
     AppTypography(material = TypographyConstants.Normal.material)
 }
@@ -42,7 +52,10 @@ private val LocalAppPaddingDimens = staticCompositionLocalOf<AppDimens.Padding> 
     TODO("Undefined")
 }
 
-@ExperimentalUnitApi
+val LocalAppInsetsPaddingValues = staticCompositionLocalOf<AppInsetsPaddingValues> {
+    TODO("Undefined")
+}
+
 @Composable
 fun AppTheme(
     isDark: Boolean = isSystemInDarkTheme(),
@@ -69,7 +82,7 @@ fun AppTheme(
         LocalAppPaddingDimens provides appPaddingDimens,
         LocalAppColors provides colors,
         LocalAppTypography provides typography,
-        LocalAppShapes provides shapes
+        LocalAppShapes provides shapes,
     ) {
         MaterialTheme(
             colors = colors.material,
@@ -77,7 +90,12 @@ fun AppTheme(
             shapes = shapes.material
         ) {
             ProvideWindowInsets {
-                content()
+                val insetsPaddingValues = rememberAppInsetsPaddingValues()
+                CompositionLocalProvider(
+                    LocalAppInsetsPaddingValues provides insetsPaddingValues
+                ) {
+                    content()
+                }
             }
         }
     }
@@ -111,7 +129,6 @@ object AppTheme {
         @Composable
         get() = LocalAppColors.current
 
-    @ExperimentalUnitApi
     val typography: AppTypography
         @ReadOnlyComposable
         @Composable
