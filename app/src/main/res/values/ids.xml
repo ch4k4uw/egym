@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="generic_login_error" type="id" />
+    <item name="generic_exercise_list_error" type="id" />
+    <item name="connectivity_exercise_list_error" type="id" />
+    <item name="generic_exercise_detail_error" type="id" />
+    <item name="connectivity_exercise_detail_error" type="id" />
+</resources>

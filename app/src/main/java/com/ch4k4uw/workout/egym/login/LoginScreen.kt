@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,10 +35,15 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import com.ch4k4uw.workout.egym.R
+import com.ch4k4uw.workout.egym.common.state.AppState
+import com.ch4k4uw.workout.egym.core.extensions.showGenericErrorAlert
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
 import com.ch4k4uw.workout.egym.core.ui.components.SignInGoogleButton
 import com.ch4k4uw.workout.egym.core.ui.components.SocialMediaButtonDefaults
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.LocalModalBottomSheetAlertInteraction
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
+import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isIdle
 import com.ch4k4uw.workout.egym.extensions.isLoading
@@ -45,8 +52,8 @@ import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
-import com.ch4k4uw.workout.egym.common.state.AppState
 import com.google.accompanist.insets.navigationBarsPadding
+import kotlinx.coroutines.launch
 
 @ExperimentalUnitApi
 @Composable
@@ -55,6 +62,10 @@ fun LoginScreen(
     onIntent: (LoginIntent) -> Unit,
     onSuccessfulLoggedIn: (UserView) -> Unit
 ) {
+    val alertInteraction = LocalModalBottomSheetAlertInteraction.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val activityResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -63,14 +74,26 @@ fun LoginScreen(
         }
     }
 
-    uiState.raiseEvent().handleSuccess {
-        when (content) {
-            is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
-                content.intent
-            )
-            is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
-                content.user
-            )
+    uiState.raiseEvent().apply {
+        handleSuccess {
+            when (content) {
+                is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
+                    content.intent
+                )
+                is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
+                    content.user
+                )
+            }
+        }
+        handleError {
+            scope.launch {
+                alertInteraction
+                    .state
+                    .showGenericErrorAlert(
+                        context = context,
+                        callId = R.id.generic_login_error
+                    )
+            }
         }
     }
 
@@ -164,6 +187,20 @@ fun LoginScreen(
             )
         }
         ContentLoadingProgressBar(visible = uiState.isLoading)
+    }
+
+    LaunchedEffect(key1 = alertInteraction.interaction.value) {
+        val interactionState = alertInteraction.interaction.value
+        if (interactionState is ModalBottomSheetAlertResultState.ClickedState) {
+            if (interactionState.callId == R.id.generic_login_error) {
+                alertInteraction.state.hide()
+                when (interactionState) {
+                    is ModalBottomSheetAlertResultState.PositiveClicked ->
+                        onIntent(LoginIntent.PerformFirebaseGoogleSignIn)
+                    else -> Unit
+                }
+            }
+        }
     }
 }
 

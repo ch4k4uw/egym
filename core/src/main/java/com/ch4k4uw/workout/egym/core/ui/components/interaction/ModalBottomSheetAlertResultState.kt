@@ -7,11 +7,15 @@ sealed class ModalBottomSheetAlertResultState(open val uuid: String) : Serializa
     data class Idle(override val uuid: String = UUID.randomUUID().toString()) :
         ModalBottomSheetAlertResultState(uuid)
 
+    sealed interface ClickedState {
+        val callId: Int
+    }
+
     data class PositiveClicked(
-        val callId: Int, override val uuid: String = UUID.randomUUID().toString()
-    ) : ModalBottomSheetAlertResultState(uuid)
+        override val callId: Int, override val uuid: String = UUID.randomUUID().toString()
+    ) : ModalBottomSheetAlertResultState(uuid), ClickedState
 
     data class NegativeClicked(
-        val callId: Int, override val uuid: String = UUID.randomUUID().toString()
-    ) : ModalBottomSheetAlertResultState(uuid)
+        override val callId: Int, override val uuid: String = UUID.randomUUID().toString()
+    ) : ModalBottomSheetAlertResultState(uuid), ClickedState
 }

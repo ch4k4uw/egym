@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,9 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
-import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertState
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertState
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.rememberModalBottomSheetAlertState
+import com.google.accompanist.insets.navigationBarsPadding
 import org.jetbrains.annotations.TestOnly
 
 
@@ -92,6 +94,10 @@ fun ModalBottomSheetAlertLayout(
         ),
         content = { content(interactionState) }
     )
+
+    key(state.callId.value) {
+        interactionState.value = ModalBottomSheetAlertResultState.Idle()
+    }
 }
 //endregion
 
@@ -205,7 +211,11 @@ private fun SheetContent(
                         Text(text = negativeButtonLabel)
                     }
                 }
-                Spacer(modifier = Modifier.height(height = AppTheme.Dimens.spacing.xxnormal))
+                Spacer(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .height(height = AppTheme.Dimens.spacing.xxnormal)
+                )
             }
         }
     }

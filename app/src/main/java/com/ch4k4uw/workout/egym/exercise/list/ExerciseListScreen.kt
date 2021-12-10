@@ -2,11 +2,13 @@ package com.ch4k4uw.workout.egym.exercise.list
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -19,9 +21,16 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import com.ch4k4uw.workout.egym.R
+import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.common.ui.component.ProfileDialog
+import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
+import com.ch4k4uw.workout.egym.core.extensions.showGenericErrorAlert
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.LocalModalBottomSheetAlertInteraction
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseHeadView
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
@@ -33,7 +42,7 @@ import com.ch4k4uw.workout.egym.extensions.handleSuccess
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
-import com.ch4k4uw.workout.egym.common.state.AppState
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 private enum class LayoutId {
@@ -89,6 +98,10 @@ fun ExerciseListScreen(
     val isLoadingStateForced = rememberSaveable { mutableStateOf(false) }
     val isResetQueryRequired = rememberSaveable { mutableStateOf(false) }
 
+    val alertInteraction = LocalModalBottomSheetAlertInteraction.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     if (uiState.isLoading) {
         isLoadingStateForced.value = false
     }
@@ -111,7 +124,22 @@ fun ExerciseListScreen(
             }
         }
         handleError {
-            showShimmer.value = false
+            scope.launch {
+                when (cause) {
+                    is NoConnectivityException -> alertInteraction
+                        .state
+                        .showGenericErrorAlert(
+                            context = context,
+                            callId = R.id.connectivity_exercise_list_error
+                        )
+                    else -> alertInteraction
+                        .state
+                        .showGenericErrorAlert(
+                            context = context,
+                            callId = R.id.generic_exercise_list_error
+                        )
+                }
+            }
         }
     }
 
@@ -209,6 +237,25 @@ fun ExerciseListScreen(
             onLogout = { onIntent(ExerciseListIntent.PerformLogout) }
         )
     }
+
+    LaunchedEffect(key1 = alertInteraction.interaction.value) {
+        val interactionState = alertInteraction.interaction.value
+        if (interactionState is ModalBottomSheetAlertResultState.ClickedState) {
+            if (
+                listOf(
+                    R.id.connectivity_exercise_list_error, R.id.generic_exercise_list_error
+                ).any { it == interactionState.callId }
+            ) {
+                alertInteraction.state.hide()
+                when (interactionState) {
+                    is ModalBottomSheetAlertResultState.PositiveClicked ->
+                        onIntent(ExerciseListIntent.FetchNextPage)
+                    else -> showShimmer.value = false
+                }
+            }
+        }
+    }
+
 }
 
 private val exerciseHeadListSaver: Saver<SnapshotStateList<ExerciseHeadView>, *> =

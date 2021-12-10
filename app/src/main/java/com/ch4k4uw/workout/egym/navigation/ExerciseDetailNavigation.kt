@@ -29,7 +29,8 @@ fun NavGraphBuilder.exerciseDetailNavigation(navigationState: NavigationState) {
                     .backPressOwner
                     ?.onBackPressedDispatcher
                     ?.onBackPressed()
-            }
+            },
+            onIntent = viewModel::performIntent
         )
     }
 }

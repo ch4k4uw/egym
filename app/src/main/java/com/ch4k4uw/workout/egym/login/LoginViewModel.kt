@@ -1,17 +1,14 @@
 package com.ch4k4uw.workout.egym.login
 
 import android.content.Intent
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ch4k4uw.workout.egym.common.BaseAppStateViewModel
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.login.domain.interactor.LoginInteractor
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
-import com.ch4k4uw.workout.egym.common.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.single
@@ -21,34 +18,27 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginInteractor: LoginInteractor
-) : ViewModel() {
-    private val mutableUiState = MutableSharedFlow<AppState<LoginState>>(replay = 1)
-    val uiState: Flow<AppState<LoginState>> = mutableUiState
-
+) : BaseAppStateViewModel<LoginState, LoginIntent>() {
     init {
         viewModelScope.launch {
-            emit(AppState.Loading())
+            emitLoading()
             loginInteractor
                 .findLoggedUser()
                 .catch {
-                    emit(AppState.Loaded())
-                    emit(AppState.Error(cause = it))
+                    emitLoaded()
+                    emitError(cause = it)
                     it.printStackTrace()
                 }
                 .collect {
-                    emit(AppState.Loaded())
+                    emitLoaded()
                     if (it != User.Empty) {
-                        emit(
-                            AppState.Success(
-                                content = LoginState.ShowSignedInUser(user = it.toView())
-                            )
-                        )
+                        emitSuccess(value = LoginState.ShowSignedInUser(user = it.toView()))
                     }
                 }
         }
     }
 
-    fun performIntent(intent: LoginIntent) {
+    override fun performIntent(intent: LoginIntent) {
         when (intent) {
             is LoginIntent.PerformFirebaseGoogleSignIn ->
                 performGoogleLogin()
@@ -59,36 +49,27 @@ class LoginViewModel @Inject constructor(
 
     private fun performGoogleLogin() {
         viewModelScope.launch {
-            emit(
-                AppState.Success(
-                    LoginState.PerformGoogleSignIn(
-                        intent = loginInteractor.findGoogleFbSignInIntent().single()
-                    )
+            emitSuccess(
+                LoginState.PerformGoogleSignIn(
+                    intent = loginInteractor.findGoogleFbSignInIntent().single()
                 )
             )
         }
     }
 
-    private suspend fun <T : AppState<LoginState>> emit(value: T) =
-        mutableUiState.emit(value)
-
     private fun parseGoogleSignResult(intent: Intent) {
         viewModelScope.launch {
-            emit(AppState.Loading())
+            emitLoading()
             loginInteractor
                 .parseGoogleFbSignInResult(intent = intent)
                 .catch {
-                    emit(AppState.Loaded())
-                    emit(AppState.Error(cause = it))
+                    emitLoaded()
+                    emitError(cause = it)
                     it.printStackTrace()
                 }
                 .collect {
-                    emit(AppState.Loaded())
-                    emit(
-                        AppState.Success(
-                            content = LoginState.ShowSignedInUser(user = it.toView())
-                        )
-                    )
+                    emitLoaded()
+                    emitSuccess(value = LoginState.ShowSignedInUser(user = it.toView()))
                 }
         }
     }
