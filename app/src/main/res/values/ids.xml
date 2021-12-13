@@ -5,4 +5,9 @@
     <item name="connectivity_exercise_list_error" type="id" />
     <item name="generic_exercise_detail_error" type="id" />
     <item name="connectivity_exercise_detail_error" type="id" />
+    <item name="training_plan_list_error" type="id" />
+    <item name="training_plan_list_fetch_user_error" type="id" />
+    <item name="training_plan_list_logout_error" type="id" />
+    <item name="training_plan_list_delete_plan_error" type="id" />
+    <item name="training_plan_delete_confirmation" type="id" />
 </resources>

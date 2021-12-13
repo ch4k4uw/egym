@@ -116,26 +116,16 @@ private fun SheetContent(
 ) {
     val configs = object {
         val color = when (type) {
-            ModalBottomSheetAlertState.ModalType.Warning -> if (AppTheme.colors.material.isLight) {
-                AppTheme.colors.amber600
-            } else {
-                AppTheme.colors.amber200
-            }
-            ModalBottomSheetAlertState.ModalType.Error -> if (AppTheme.colors.material.isLight) {
-                AppTheme.colors.deepOrange600
-            } else {
-                AppTheme.colors.deepOrange200
-            }
-            ModalBottomSheetAlertState.ModalType.Info -> if (AppTheme.colors.material.isLight) {
-                AppTheme.colors.green600
-            } else {
-                AppTheme.colors.green200
-            }
+            ModalBottomSheetAlertState.ModalType.Warning -> AppTheme.colors.amber
+            ModalBottomSheetAlertState.ModalType.Error -> AppTheme.colors.deepOrange
+            ModalBottomSheetAlertState.ModalType.Info -> AppTheme.colors.green
+            ModalBottomSheetAlertState.ModalType.Question -> AppTheme.colors.green
         }
         val icon = when (type) {
             ModalBottomSheetAlertState.ModalType.Warning -> Icons.Filled.Warning
             ModalBottomSheetAlertState.ModalType.Error -> Icons.Filled.Close
             ModalBottomSheetAlertState.ModalType.Info -> Icons.Filled.Info
+            ModalBottomSheetAlertState.ModalType.Question -> Icons.Filled.Info
         }
     }
     Column(

@@ -29,4 +29,12 @@
     <string name="exercise_tag_flexibility_title">Flexibility</string>
 
     <string name="exercise_detail_tags_label">Tags: %1$s</string>
+
+    <string name="no_content_to_show_message">No content to show</string>
+
+    <string name="training_plan_list_title">Training plans</string>
+    <string name="training_plan_delete_plan_warning_title">Action confirmation</string>
+    <string name="training_plan_delete_plan_warning_message">Are you sure you want to delete the \"%1$s\" plan?</string>
+    <string name="training_plan_delete_plan_warning_positive_button">DELETE</string>
+    <string name="training_plan_delete_plan_warning_negative_button">Keep it</string>
 </resources>

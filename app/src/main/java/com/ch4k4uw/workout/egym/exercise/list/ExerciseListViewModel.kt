@@ -1,7 +1,7 @@
 package com.ch4k4uw.workout.egym.exercise.list
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ch4k4uw.workout.egym.common.BaseAppStateViewModel
 import com.ch4k4uw.workout.egym.core.auth.domain.entity.User
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseHeadPager
 import com.ch4k4uw.workout.egym.core.exercise.domain.data.ExerciseTag
@@ -11,12 +11,9 @@ import com.ch4k4uw.workout.egym.exercise.list.extensions.toView
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.login.extensions.toView
-import com.ch4k4uw.workout.egym.common.state.AppState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
@@ -24,16 +21,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import timber.log.Timber
 import javax.inject.Inject
 
 @FlowPreview
 @HiltViewModel
 class ExerciseListViewModel @Inject constructor(
     private val exerciseListInteractor: ExerciseListInteractor
-) : ViewModel() {
-    private val mutableUiState = MutableSharedFlow<AppState<ExerciseListState>>(replay = 1)
-    val uiState: Flow<AppState<ExerciseListState>> = mutableUiState
-
+) : BaseAppStateViewModel<ExerciseListState, ExerciseListIntent>() {
     private var exerciseHeadPager: ExerciseHeadPager? = null
     private val exerciseHeadList = mutableListOf<ExerciseHead>()
 
@@ -47,7 +42,7 @@ class ExerciseListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            emit(AppState.Loading())
+            emitLoading()
             launch {
                 queryFlow.collect {
                     findExercisesHeadsPager(query = it.first, tags = it.second)
@@ -56,12 +51,12 @@ class ExerciseListViewModel @Inject constructor(
             exerciseListInteractor
                 .findLoggedUser()
                 .catch {
-                    emit(AppState.Loaded())
+                    emitLoaded()
                     emitError(cause = it)
-                    it.printStackTrace()
+                    Timber.e(it)
                 }
                 .collect { user ->
-                    emit(AppState.Loaded())
+                    emitLoaded()
                     val state = if (user != User.Empty) {
                         queryChannel.send(Pair("", listOf()))
                         ExerciseListState.DisplayUserData(user = user.toView())
@@ -72,7 +67,6 @@ class ExerciseListViewModel @Inject constructor(
                     exerciseListInteractor
                         .findExerciseTags()
                         .catch {
-                            emit(AppState.Loaded())
                             emitError(cause = it)
                             it.printStackTrace()
                         }
@@ -82,9 +76,6 @@ class ExerciseListViewModel @Inject constructor(
                 }
         }
     }
-
-    private suspend fun <T : AppState<ExerciseListState>> emit(value: T) =
-        mutableUiState.emit(value)
 
     private var isLoading = false
     private suspend fun findExercisesHeadsPager(query: String, tags: List<ExerciseTag>) {
@@ -111,22 +102,22 @@ class ExerciseListViewModel @Inject constructor(
                 if (pager.index == -1 || pager.index < pager.count - 1) {
                     while (isLoading) yield()
                     isLoading = true
-                    emit(AppState.Loading(tag = ExerciseListState.ExerciseListTag))
+                    emitLoading(tag = ExerciseListState.ExerciseListTag)
                     pager
                         .next()
                         .catch {
-                            emit(AppState.Loaded(tag = ExerciseListState.ExerciseListTag))
-                            emit(AppState.Error(cause = it))
-                            it.printStackTrace()
+                            emitLoaded(tag = ExerciseListState.ExerciseListTag)
+                            emitError(cause = it)
+                            Timber.e(it)
                             isLoading = false
                         }
                         .collect { nextPager ->
                             exerciseHeadList.addAll(nextPager.items)
-                            emit(AppState.Loaded(tag = ExerciseListState.ExerciseListTag))
+                            emitLoaded(tag = ExerciseListState.ExerciseListTag)
                             if (nextPager.items.isNotEmpty()) {
                                 emitSuccess(
                                     value = ExerciseListState.ShowExerciseList(
-                                        exercises = exerciseHeadList.map { it.toView() }
+                                        exercises = exerciseHeadList.toView()
                                     )
                                 )
                             } else {
@@ -141,17 +132,11 @@ class ExerciseListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun emitError(cause: Throwable) =
-        emit(AppState.Error(cause))
-
-    private suspend fun <T : ExerciseListState> emitSuccess(value: T) =
-        emit(AppState.Success(value))
-
     private fun performQuery(query: String = "", tags: List<ExerciseTag> = listOf()) {
         queryChannel.trySend(Pair(query, tags))
     }
 
-    fun performIntent(intent: ExerciseListIntent) {
+    override fun performIntent(intent: ExerciseListIntent) {
         when (intent) {
             is ExerciseListIntent.PerformLogout -> performLogout()
             is ExerciseListIntent.FetchNextPage -> loadNextPage()
@@ -163,15 +148,15 @@ class ExerciseListViewModel @Inject constructor(
 
     private fun performLogout() {
         viewModelScope.launch {
-            emit(AppState.Loading())
+            emitLoading()
             exerciseListInteractor.performLogout()
                 .catch {
-                    emit(AppState.Loaded())
+                    emitLoaded()
                     emitError(it)
-                    it.printStackTrace()
+                    Timber.e(it)
                 }
                 .collect {
-                    emit(AppState.Loaded())
+                    emitLoaded()
                     emitSuccess(ExerciseListState.ShowLoginScreen)
                 }
         }

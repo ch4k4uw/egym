@@ -23,6 +23,13 @@ internal object ColorConstants {
     private val DarkRed = Color(0xffcf6679)
     private val LightSurface = Color.White
 
+    private val Amber600 = Color(color = 0xFFFFB300)
+    private val Amber200 = Color(color = 0xFFFFE082)
+    private val Green600 = Color(color = 0xFF43A047)
+    private val Green300 = Color(color = 0xFF81C784)
+    private val DeepOrange600 = Color(color = 0xFFF4511E)
+    private val DeepOrange300 = Color(color = 0xFFFF8A65)
+
     val LightColors: AppColors by lazy {
         AppColors(
             material = lightColors(
@@ -39,7 +46,10 @@ internal object ColorConstants {
                 onSurface = Color.Black,
                 onError = Color.White
             ),
-            googleButton = LightSurface
+            googleButton = LightSurface,
+            amber = Amber600,
+            green = Green600,
+            deepOrange = DeepOrange600
         )
     }
 
@@ -61,7 +71,10 @@ internal object ColorConstants {
                 onSurface = Color.White,
                 onError = Color.Black
             ),
-            googleButton = Color(color = 0xFF4285F4)
+            googleButton = Color(color = 0xFF4285F4),
+            amber = Amber200,
+            green = Green300,
+            deepOrange = DeepOrange300
         )
     }
 

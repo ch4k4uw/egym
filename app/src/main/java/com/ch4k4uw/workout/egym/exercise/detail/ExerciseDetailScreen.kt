@@ -24,13 +24,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,7 +38,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,12 +48,13 @@ import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
+import com.ch4k4uw.workout.egym.core.extensions.asClickedState
 import com.ch4k4uw.workout.egym.core.extensions.rememberBitmapLoader
-import com.ch4k4uw.workout.egym.core.extensions.showGenericErrorAlert
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ShimmerRectangle1
-import com.ch4k4uw.workout.egym.core.ui.components.interaction.LocalModalBottomSheetAlertInteraction
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertEffect
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
+import com.ch4k4uw.workout.egym.core.ui.components.interaction.rememberModalBottomSheetAlert
 import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseDetailIntent
 import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseDetailState
 import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseView
@@ -66,7 +64,6 @@ import com.ch4k4uw.workout.egym.extensions.asSuccess
 import com.ch4k4uw.workout.egym.extensions.handleError
 import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.extensions.raiseEvent
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 private enum class LayoutId {
@@ -108,9 +105,7 @@ fun ExerciseDetailScreen(
 
     val stateHolder = rememberSaveableCollapsingTopBar()
 
-    val alertInteraction = LocalModalBottomSheetAlertInteraction.current
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val modalBottomSheetAlert = rememberModalBottomSheetAlert()
 
     uiState.value.asSuccess()?.apply {
         when (content) {
@@ -121,21 +116,15 @@ fun ExerciseDetailScreen(
 
     uiState.raiseEvent().apply {
         handleError {
-            scope.launch {
-                when (cause) {
-                    is NoConnectivityException -> alertInteraction
-                        .state
-                        .showGenericErrorAlert(
-                            context = context,
-                            callId = R.id.connectivity_exercise_detail_error
-                        )
-                    else -> alertInteraction
-                        .state
-                        .showGenericErrorAlert(
-                            context = context,
-                            callId = R.id.generic_exercise_detail_error
-                        )
-                }
+            when (cause) {
+                is NoConnectivityException -> modalBottomSheetAlert
+                    .showConnectivityErrorAlert(
+                        callId = R.id.connectivity_exercise_detail_error
+                    )
+                else -> modalBottomSheetAlert
+                    .showGenericErrorAlert(
+                        callId = R.id.generic_exercise_detail_error
+                    )
             }
         }
     }
@@ -397,20 +386,13 @@ fun ExerciseDetailScreen(
         }
     }
 
-    LaunchedEffect(key1 = alertInteraction.interaction.value) {
-        val interactionState = alertInteraction.interaction.value
-        if (interactionState is ModalBottomSheetAlertResultState.ClickedState) {
-            if (
-                listOf(
-                    R.id.connectivity_exercise_detail_error, R.id.generic_exercise_detail_error
-                ).any { it == interactionState.callId }
-            ) {
-                alertInteraction.state.hide()
-                when (interactionState) {
-                    is ModalBottomSheetAlertResultState.PositiveClicked ->
-                        onIntent(ExerciseDetailIntent.FetchExerciseDetails)
-                    else -> onShowExerciseList()
-                }
+    ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
+        asClickedState(R.id.connectivity_exercise_detail_error, R.id.generic_exercise_detail_error) {
+            hide()
+            when (this) {
+                is ModalBottomSheetAlertResultState.PositiveClicked ->
+                    onIntent(ExerciseDetailIntent.FetchExerciseDetails)
+                else -> onShowExerciseList()
             }
         }
     }

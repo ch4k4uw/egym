@@ -14,9 +14,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
-fun <T> Flow<AppState<T>>.CollectEachState(content: @Composable (State<AppState<T>>) -> Unit) {
+fun <T> Flow<AppState<T>>.collectAsBufferedState(): State<AppState<T>> {
     val coroutineScope = rememberCoroutineScope()
-
     val uiStateQueue = remember {
         mutableStateListOf<AppState<T>>()
     }
@@ -30,7 +29,6 @@ fun <T> Flow<AppState<T>>.CollectEachState(content: @Composable (State<AppState<
             }
         }
     }
-    content(uiState)
     LaunchedEffect(key1 = this, key2 = LocalContext.current) {
         coroutineScope.launch {
             collect {
@@ -43,5 +41,5 @@ fun <T> Flow<AppState<T>>.CollectEachState(content: @Composable (State<AppState<
             uiStateQueue.removeAt(0)
         }
     }
+    return uiState
 }
-

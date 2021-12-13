@@ -1,4 +1,4 @@
-package com.ch4k4uw.workout.egym.exercise.list.ui.component
+package com.ch4k4uw.workout.egym.common.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -13,29 +13,31 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import com.ch4k4uw.workout.egym.R
-import com.ch4k4uw.workout.egym.common.ui.component.RemoteIcon
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
+import com.ch4k4uw.workout.egym.login.interaction.UserView
 
 @Composable
-fun ExerciseListTopAppBar(
+fun GenericTopAppBar(
     modifier: Modifier,
-    queryText: String,
-    profileImage: String,
+    title: String,
+    userData: UserView,
+    queryText: String = "",
     onNavigateBack: () -> Unit,
-    onSearchButtonClick: () -> Unit,
-    onProfileButtonClick: () -> Unit,
+    onSearchButtonClick: (() -> Unit)? = null,
+    onLogoutClick: () -> Unit,
 ) {
+    val isProfileDialogShowing = remember { mutableStateOf(false) }
     TopAppBar(
         modifier = modifier,
         title = {
             Column {
                 Text(
-                    text = stringResource(id = R.string.exercise_list_title),
+                    text = title,
                     style = if (queryText.isBlank()) {
                         AppTheme.typography.material.h6
                     } else {
@@ -55,17 +57,19 @@ fun ExerciseListTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = { onNavigateBack() }) {
+            IconButton(onClick = onNavigateBack) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")
             }
         },
         actions = {
-            IconButton(onClick = onSearchButtonClick) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+            if (onSearchButtonClick != null) {
+                IconButton(onClick = onSearchButtonClick) {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                }
             }
-            IconButton(onClick = onProfileButtonClick) {
+            IconButton(onClick = { isProfileDialogShowing.value = true }) {
                 RemoteIcon(
-                    url = profileImage,
+                    url = userData.image,
                     default = Icons.Filled.Person,
                     contentDescription = "",
                     modifier = Modifier
@@ -76,4 +80,14 @@ fun ExerciseListTopAppBar(
             }
         }
     )
+
+    if (isProfileDialogShowing.value) {
+        ProfileDialog(
+            image = userData.image,
+            name = userData.name,
+            email = userData.email,
+            onDismissRequest = { isProfileDialogShowing.value = false },
+            onLogout = onLogoutClick
+        )
+    }
 }

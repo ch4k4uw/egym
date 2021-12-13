@@ -72,32 +72,31 @@ private class CollapsingTopBarStateHolderImpl : CollapsingTopBarStateHolder {
             (topBarMaxHeightPx + topBarHeightOffsetPx.roundToInt()).toDp()
         }
 
-    override val nestedScrollConnection =
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                val newHeightOffset = topBarHeightOffsetPx + topBarOffsetPx + delta
-                topBarHeightOffsetPx = newHeightOffset.coerceIn(
-                    minimumValue = (-topBarMaxHeightPx + topBarMinHeightPx).toFloat(),
-                    maximumValue = 0f
-                )
-                val newOffset = topBarHeightOffsetPx + topBarOffsetPx +
-                        topBarMaxHeightPx - topBarMinHeightPx + delta
+    override val nestedScrollConnection = object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            val delta = available.y
+            val newHeightOffset = topBarHeightOffsetPx + topBarOffsetPx + delta
+            topBarHeightOffsetPx = newHeightOffset.coerceIn(
+                minimumValue = (-topBarMaxHeightPx + topBarMinHeightPx).toFloat(),
+                maximumValue = 0f
+            )
+            val newOffset = topBarHeightOffsetPx + topBarOffsetPx +
+                    topBarMaxHeightPx - topBarMinHeightPx + delta
 
-                topBarOffsetPx = newOffset.coerceIn(
-                    minimumValue = -topBarMinHeightPx.toFloat(),
-                    maximumValue = 0f
-                )
-                return if (
-                    topBarHeightOffsetPx == 0f ||
-                    topBarOffsetPx == -topBarMinHeightPx.toFloat()
-                ) {
-                    Offset.Zero
-                } else {
-                    available
-                }
+            topBarOffsetPx = newOffset.coerceIn(
+                minimumValue = -topBarMinHeightPx.toFloat(),
+                maximumValue = 0f
+            )
+            return if (
+                topBarHeightOffsetPx == 0f ||
+                topBarOffsetPx == -topBarMinHeightPx.toFloat()
+            ) {
+                Offset.Zero
+            } else {
+                available
             }
         }
+    }
 
     override fun update(minHeightPx: Int, maxHeightPx: Int) {
         topBarMinHeightPx = minHeightPx

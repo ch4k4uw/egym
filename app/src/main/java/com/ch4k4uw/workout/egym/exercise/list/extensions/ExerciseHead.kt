@@ -9,3 +9,6 @@ fun ExerciseHead.toView(): ExerciseHeadView =
         image = image,
         title = title
     )
+
+fun List<ExerciseHead>.toView(): List<ExerciseHeadView> =
+    map { it.toView() }

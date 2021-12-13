@@ -9,15 +9,15 @@ import androidx.compose.runtime.staticCompositionLocalOf
 @ExperimentalMaterialApi
 data class ModalBottomSheetAlertInteraction(
     val state: ModalBottomSheetAlertState,
-    val interaction: State<ModalBottomSheetAlertResultState>
+    val result: State<ModalBottomSheetAlertResultState>
 )
 
 @Composable
 fun rememberModalBottomSheetAlertInteraction(
     state: ModalBottomSheetAlertState,
-    interaction: State<ModalBottomSheetAlertResultState>
+    result: State<ModalBottomSheetAlertResultState>
 ) = remember {
-    ModalBottomSheetAlertInteraction(state = state, interaction = interaction)
+    ModalBottomSheetAlertInteraction(state = state, result = result)
 }
 
 @ExperimentalMaterialApi

@@ -56,77 +56,66 @@ fun ExerciseListHeadCard(
     ) {
         val imageHeight = maxWidth * EGymTheme.Dimens.exerciseHeadCard.imageHeight
 
-        Column {
-            Card(
-                elevation = AppTheme.Dimens.spacing.tiny,
-                shape = RectangleShape
-            ) {
-                Column {
-                    var image by remember { mutableStateOf<Bitmap?>(null) }
-                    var error by remember { mutableStateOf(false) }
+        Card(
+            elevation = AppTheme.Dimens.spacing.tiny,
+            shape = RectangleShape
+        ) {
+            Column {
+                var image by remember { mutableStateOf<Bitmap?>(null) }
+                var error by remember { mutableStateOf(false) }
 
-                    if (imageUrl.isNotBlank()) {
-                        Glide
-                            .with(LocalContext.current)
-                            .asBitmap()
-                            .load(imageUrl)
-                            .into(object : CustomTarget<Bitmap>() {
-                                override fun onResourceReady(
-                                    resource: Bitmap,
-                                    transition: Transition<in Bitmap>?
-                                ) {
-                                    image = resource
-                                }
-
-                                override fun onLoadCleared(placeholder: Drawable?) {
-                                }
-
-                                override fun onLoadFailed(errorDrawable: Drawable?) {
-                                    error = true
-                                }
-                            })
-                    }
-
-                    if (!error) {
-                        val bitmap = image
-                        if (bitmap != null) {
-                            var colorPalette by remember { mutableStateOf<Palette?>(null) }
-                            var calculatingColorPalette = remember { false }
-                            if (colorPalette == null && !calculatingColorPalette) {
-                                true.also { calculatingColorPalette = it }
-                                Palette.from(bitmap).generate {
-                                    colorPalette = it
-                                }
-                            }
-                            val backgroundColor = colorPalette?.let {
-                                if (AppTheme.colors.material.isLight) {
-                                    it.vibrantSwatch
-                                } else {
-                                    it.mutedSwatch
-                                }
-                            }?.rgb
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = null,
-                                contentScale = ContentScale.FillHeight,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(imageHeight)
-                                    .run {
-                                        backgroundColor?.let { background(color = Color(it)) }
-                                            ?: this
-                                    }
-                            )
-                        } else {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(imageHeight)
+                if (imageUrl.isNotBlank()) {
+                    Glide
+                        .with(LocalContext.current)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
                             ) {
-                                Icon(imageVector = placeHolderImage, contentDescription = null)
+                                image = resource
+                            }
+
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+
+                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                error = true
+                            }
+                        })
+                }
+
+                if (!error) {
+                    val bitmap = image
+                    if (bitmap != null) {
+                        var colorPalette by remember { mutableStateOf<Palette?>(null) }
+                        var calculatingColorPalette = remember { false }
+                        if (colorPalette == null && !calculatingColorPalette) {
+                            true.also { calculatingColorPalette = it }
+                            Palette.from(bitmap).generate {
+                                colorPalette = it
                             }
                         }
+                        val backgroundColor = colorPalette?.let {
+                            if (AppTheme.colors.material.isLight) {
+                                it.vibrantSwatch
+                            } else {
+                                it.mutedSwatch
+                            }
+                        }?.rgb
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillHeight,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(imageHeight)
+                                .run {
+                                    backgroundColor?.let { background(color = Color(it)) }
+                                        ?: this
+                                }
+                        )
                     } else {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -134,17 +123,25 @@ fun ExerciseListHeadCard(
                                 .fillMaxWidth()
                                 .height(imageHeight)
                         ) {
-                            Icon(imageVector = errorImage, contentDescription = null)
+                            Icon(imageVector = placeHolderImage, contentDescription = null)
                         }
                     }
-                    Spacer(
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .height(AppTheme.Dimens.spacing.tiny)
-                    )
-                    Text(text = title, style = AppTheme.typography.material.h6)
+                            .fillMaxWidth()
+                            .height(imageHeight)
+                    ) {
+                        Icon(imageVector = errorImage, contentDescription = null)
+                    }
                 }
+                Spacer(
+                    modifier = Modifier
+                        .height(AppTheme.Dimens.spacing.tiny)
+                )
+                Text(text = title, style = AppTheme.typography.material.h6)
             }
-            Spacer(modifier = Modifier.height(AppTheme.Dimens.spacing.xtiny))
         }
     }
 }

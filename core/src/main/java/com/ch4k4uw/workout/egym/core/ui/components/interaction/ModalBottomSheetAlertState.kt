@@ -18,7 +18,7 @@ class ModalBottomSheetAlertState(
     val modalState: ModalBottomSheetState
 ) {
     enum class ModalType {
-        Error, Warning, Info
+        Error, Warning, Info, Question
     }
 
     private val mutableCallId = mutableStateOf(0)

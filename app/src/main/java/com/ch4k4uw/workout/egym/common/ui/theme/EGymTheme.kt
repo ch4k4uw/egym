@@ -26,7 +26,7 @@ fun EGymTheme(content: @Composable () -> Unit) {
         ) { alertResultState ->
             val modalAlertInteraction = rememberModalBottomSheetAlertInteraction(
                 state = modalAlertLayoutState,
-                interaction = alertResultState
+                result = alertResultState
             )
             CompositionLocalProvider(
                 LocalModalBottomSheetAlertInteraction provides modalAlertInteraction

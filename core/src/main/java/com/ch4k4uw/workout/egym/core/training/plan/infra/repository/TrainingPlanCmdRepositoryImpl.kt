@@ -43,16 +43,20 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
                 .whereEqualTo(TrainingPlanConstants.Field.UserId, user.id)
                 .get()
                 .addOnSuccessListener { snapshot ->
-                    snapshot
-                        .documents
-                        .mapNotNull { doc ->
-                            doc.toObject(TrainingPlanRemote::class.java)
-                                ?.also { it.id = doc.id }
-                                ?.toDomain()
-                        }
-                        .also {
-                            continuation.resume(value = it)
-                        }
+                    try {
+                        snapshot
+                            .documents
+                            .mapNotNull { doc ->
+                                doc.toObject(TrainingPlanRemote::class.java)
+                                    ?.also { it.id = doc.id }
+                                    ?.toDomain()
+                            }
+                            .also {
+                                continuation.resume(value = it)
+                            }
+                    } catch (cause: Throwable) {
+                        continuation.resumeWithException(cause)
+                    }
                 }
                 .addOnFailureListener(continuation::resumeWithException)
                 .addOnCanceledListener(continuation::cancel)

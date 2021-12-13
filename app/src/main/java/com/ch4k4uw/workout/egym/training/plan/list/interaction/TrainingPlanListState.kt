@@ -1,8 +1,15 @@
 package com.ch4k4uw.workout.egym.training.plan.list.interaction
 
-import com.ch4k4uw.workout.egym.core.training.plan.domain.entity.TrainingPlan
+import com.ch4k4uw.workout.egym.login.interaction.UserView
 
 sealed class TrainingPlanListState {
-    data class ShowTrainingPlanList(val plans: List<TrainingPlan>) : TrainingPlanListState()
-    object DisplayNoTrainingPlansToShowMessage : TrainingPlanListState()
+    object ShowLoginScreen : TrainingPlanListState()
+    data class DisplayUserData(val user: UserView): TrainingPlanListState()
+    data class ShowPlanList(val plans: List<TrainingPlanView>) : TrainingPlanListState()
+    object DisplayNoPlansToShowMessage : TrainingPlanListState()
+    data class ConfirmPlanDeletion(val plan: TrainingPlanView): TrainingPlanListState()
+    object FetchUserDataTag : TrainingPlanListState()
+    object FetchPlanListTag : TrainingPlanListState()
+    object PerformLogoutTag : TrainingPlanListState()
+    object DeletePlanTag : TrainingPlanListState()
 }

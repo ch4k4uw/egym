@@ -1,5 +1,5 @@
 object Versions {
-    const val Gradle = "7.0.3"
+    const val Gradle = "7.0.4"
     object Kotlin {
         const val Gradle = "1.5.31"
         const val Coroutines = "1.5.1"
@@ -11,7 +11,7 @@ object Versions {
         const val ActivityKtx = "1.3.1"
         const val Activity = "1.3.1"
         const val Icons = "1.0.5"
-        const val IconsExtended = "1.0.0-beta09"
+        const val IconsExtended = "1.1.0-beta04"
         const val Navigation = "2.4.0-beta02"
         const val Annotation = "1.3.0"
         object Hilt {
