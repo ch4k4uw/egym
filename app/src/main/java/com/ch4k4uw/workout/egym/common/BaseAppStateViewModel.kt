@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.ch4k4uw.workout.egym.common.state.AppState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.io.Serializable
 
-abstract class BaseAppStateViewModel<State, Intent> : ViewModel() {
+abstract class BaseAppStateViewModel<State : Serializable, Intent> : ViewModel() {
     private val mutableUiState = MutableSharedFlow<AppState<State>>(replay = 1)
     val uiState: Flow<AppState<State>> = mutableUiState
 

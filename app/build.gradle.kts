@@ -93,8 +93,6 @@ dependencies {
     implementation(Libraries.Google.Material)
     implementation(Libraries.Compose.Navigation)
     implementation(Libraries.Compose.Annotation)
-    implementation(Libraries.Compose.Icons)
-    implementation(Libraries.Compose.IconsExtended)
     implementation(Libraries.Glide)
 
     //Hilt

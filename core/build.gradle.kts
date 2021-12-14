@@ -79,6 +79,8 @@ dependencies {
     implementation(Libraries.Firebase.Firestore)
     implementation(Libraries.Google.Gms.Auth)
     implementation(Libraries.Glide)
+    api(Libraries.Compose.Icons)
+    api(Libraries.Compose.IconsExtended)
     api(Libraries.Timber)
 
     //Accompanist

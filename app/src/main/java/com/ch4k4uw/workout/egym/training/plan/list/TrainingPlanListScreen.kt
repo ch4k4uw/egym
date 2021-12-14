@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +39,6 @@ import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetA
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertState
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.rememberModalBottomSheetAlert
-import com.ch4k4uw.workout.egym.extensions.isLoading
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.training.plan.list.interaction.TrainingPlanListIntent
 import com.ch4k4uw.workout.egym.training.plan.list.interaction.TrainingPlanListState

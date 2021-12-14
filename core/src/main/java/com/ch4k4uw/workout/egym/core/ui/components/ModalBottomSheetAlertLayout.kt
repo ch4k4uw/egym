@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -119,13 +120,13 @@ private fun SheetContent(
             ModalBottomSheetAlertState.ModalType.Warning -> AppTheme.colors.amber
             ModalBottomSheetAlertState.ModalType.Error -> AppTheme.colors.deepOrange
             ModalBottomSheetAlertState.ModalType.Info -> AppTheme.colors.green
-            ModalBottomSheetAlertState.ModalType.Question -> AppTheme.colors.green
+            ModalBottomSheetAlertState.ModalType.Question -> AppTheme.colors.amber
         }
         val icon = when (type) {
             ModalBottomSheetAlertState.ModalType.Warning -> Icons.Filled.Warning
             ModalBottomSheetAlertState.ModalType.Error -> Icons.Filled.Close
             ModalBottomSheetAlertState.ModalType.Info -> Icons.Filled.Info
-            ModalBottomSheetAlertState.ModalType.Question -> Icons.Filled.Info
+            ModalBottomSheetAlertState.ModalType.Question -> Icons.Filled.QuestionAnswer
         }
     }
     Column(
