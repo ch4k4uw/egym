@@ -68,8 +68,10 @@ fun <T : Serializable> Flow<AppState<T>>.collectAsBufferedState(): State<AppStat
         }
     }
     LaunchedEffect(key1 = uiStateQueue.size) {
-        if (uiStateQueue.isNotEmpty()) {
-            uiStateQueue.removeAt(0)
+        launch {
+            if (uiStateQueue.isNotEmpty()) {
+                uiStateQueue.removeAt(0)
+            }
         }
     }
     return uiState
