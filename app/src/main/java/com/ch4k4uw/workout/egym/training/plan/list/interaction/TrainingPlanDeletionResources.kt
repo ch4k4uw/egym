@@ -21,7 +21,7 @@ private class ResourcesImpl(
     private val context: Context
 ) : TrainingPlanDeletionResources {
     override val id: Int
-        get() = R.id.training_plan_delete_confirmation
+        get() = R.id.training_plan_list_delete_confirmation
     override val title: String
         get() = context.getString(R.string.training_plan_delete_plan_warning_title)
     override fun message(planTitle: String): String =

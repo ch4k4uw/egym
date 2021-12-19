@@ -11,6 +11,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Stable
 @ExperimentalMaterialApi
@@ -54,10 +56,15 @@ class ModalBottomSheetAlertState(
 
     suspend fun hide() {
         modalState.hide()
+        coroutineScope {
+            launch {
+                mutableCallId.value = 0
+            }
+        }
     }
 
     companion object {
-        fun Saver(
+        fun saver(
             modalState: ModalBottomSheetState
         ): Saver<ModalBottomSheetAlertState, *> = Saver(
             save = {
@@ -88,7 +95,7 @@ class ModalBottomSheetAlertState(
 @Composable
 fun rememberModalBottomSheetAlertState(): ModalBottomSheetAlertState {
     val modalState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    return rememberSaveable(saver = ModalBottomSheetAlertState.Saver(modalState = modalState)) {
+    return rememberSaveable(saver = ModalBottomSheetAlertState.saver(modalState = modalState)) {
         ModalBottomSheetAlertState(modalState = modalState)
     }
 }

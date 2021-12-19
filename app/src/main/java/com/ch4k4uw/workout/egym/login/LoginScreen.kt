@@ -18,10 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -42,24 +43,23 @@ import com.ch4k4uw.workout.egym.core.ui.components.SocialMediaButtonDefaults
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertEffect
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.ModalBottomSheetAlertResultState
 import com.ch4k4uw.workout.egym.core.ui.components.interaction.rememberModalBottomSheetAlert
-import com.ch4k4uw.workout.egym.extensions.handleError
-import com.ch4k4uw.workout.egym.extensions.handleSuccess
-import com.ch4k4uw.workout.egym.extensions.isIdle
-import com.ch4k4uw.workout.egym.extensions.isLoading
-import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.LoginIntent
 import com.ch4k4uw.workout.egym.login.interaction.LoginState
 import com.ch4k4uw.workout.egym.login.interaction.UserView
 import com.ch4k4uw.workout.egym.login.interaction.rememberBkgAnimation
 import com.google.accompanist.insets.navigationBarsPadding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 
 @ExperimentalUnitApi
 @Composable
 fun LoginScreen(
-    uiState: State<AppState<LoginState>>,
+    uiState: Flow<AppState<LoginState>>,
     onIntent: (LoginIntent) -> Unit,
     onSuccessfulLoggedIn: (UserView) -> Unit
 ) {
+    var isLoading by rememberSaveable { mutableStateOf(false) }
     val modalBottomSheetAlert = rememberModalBottomSheetAlert()
 
     val activityResultLauncher = rememberLauncherForActivityResult(
@@ -70,23 +70,6 @@ fun LoginScreen(
         }
     }
 
-    uiState.raiseEvent().apply {
-        handleSuccess {
-            when (content) {
-                is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
-                    content.intent
-                )
-                is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
-                    content.user
-                )
-            }
-        }
-        handleError {
-            modalBottomSheetAlert
-                .showGenericErrorAlert(callId = R.id.generic_login_error)
-        }
-    }
-
     val loginAvatarImage = ImageBitmap
         .imageResource(id = R.drawable.login_background)
     val backgroundImage = ImageBitmap
@@ -94,9 +77,7 @@ fun LoginScreen(
 
     val bkgAnim = rememberBkgAnimation()
     val screenWidthPx = LocalContext.current.resources.displayMetrics.widthPixels
-    val showInteractionControls = !uiState.isLoading && !uiState.isIdle &&
-            (uiState.value as? AppState.Success<LoginState>)
-                ?.content !is LoginState.ShowSignedInUser
+    var showInteractionControls by rememberSaveable { mutableStateOf(true) }// !isLoading && !uiState.isIdle && (uiState.value as? AppState.Success<LoginState>)?.content !is LoginState.ShowSignedInUser
     val interactionControlsAlpha by animateFloatAsState(
         targetValue = if (!showInteractionControls) 0f else 1f,
         animationSpec = tween(durationMillis = 300)
@@ -176,7 +157,41 @@ fun LoginScreen(
                 }
             )
         }
-        ContentLoadingProgressBar(visible = uiState.isLoading)
+        ContentLoadingProgressBar(visible = isLoading)
+    }
+
+    LaunchedEffect(Unit) {
+        uiState.collect { state ->
+            when (state) {
+                is AppState.Loading -> state.apply {
+                    isLoading = true
+                }
+                is AppState.Loaded -> state.apply {
+                    isLoading = false
+                }
+                is AppState.Success -> state.apply {
+                    when (content) {
+                        is LoginState.PerformGoogleSignIn -> activityResultLauncher.launch(
+                            content.intent
+                        )
+                        is LoginState.ShowSignedInUser -> onSuccessfulLoggedIn(
+                            content.user
+                        )
+                    }
+                }
+                is AppState.Error -> state.apply {
+                    modalBottomSheetAlert
+                        .showGenericErrorAlert(callId = R.id.generic_login_error)
+                }
+                else -> Unit
+            }
+            val isIdle = state is AppState.Idle
+            val success = state as? AppState.Success<LoginState>
+            val isShowSignedInUser = success?.content is LoginState.ShowSignedInUser
+            val isPerformGoogleSignIn = success?.content is LoginState.PerformGoogleSignIn
+            showInteractionControls = !isLoading && !isIdle && !isShowSignedInUser &&
+                    !isPerformGoogleSignIn
+        }
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
@@ -197,7 +212,7 @@ fun LoginScreen(
 fun PreviewLoginDarkScreen() {
     AppTheme {
         LoginScreen(
-            uiState = remember { mutableStateOf(AppState.Loading()) },
+            uiState = flowOf(AppState.Loading()),
             onIntent = { },
             onSuccessfulLoggedIn = { }
         )
@@ -210,7 +225,7 @@ fun PreviewLoginDarkScreen() {
 fun PreviewLoginLightScreen() {
     AppTheme {
         LoginScreen(
-            uiState = remember { mutableStateOf(AppState.Loading()) },
+            uiState = flowOf(AppState.Loading()),
             onIntent = { },
             onSuccessfulLoggedIn = { }
         )

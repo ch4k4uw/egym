@@ -12,11 +12,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -26,9 +28,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
-import com.ch4k4uw.workout.egym.common.state.AppErrorStateEffect
 import com.ch4k4uw.workout.egym.common.state.AppState
-import com.ch4k4uw.workout.egym.common.state.AppSuccessStateEffect
 import com.ch4k4uw.workout.egym.common.ui.component.EmptyContentPlaceholder
 import com.ch4k4uw.workout.egym.common.ui.component.GenericTopAppBar
 import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
@@ -46,6 +46,8 @@ import com.ch4k4uw.workout.egym.training.plan.list.interaction.TrainingPlanView
 import com.ch4k4uw.workout.egym.training.plan.list.interaction.rememberTrainingPlanDeletionResources
 import com.ch4k4uw.workout.egym.training.plan.list.ui.component.TrainingPlanCard
 import com.ch4k4uw.workout.egym.training.plan.list.ui.component.rememberSaveableTopBarStateHolder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlin.math.roundToInt
 
 private enum class LayoutId {
@@ -54,10 +56,11 @@ private enum class LayoutId {
 
 @Composable
 fun TrainingPlanListScreen(
-    uiState: State<AppState<TrainingPlanListState>>,
+    uiState: Flow<AppState<TrainingPlanListState>>,
     onIntent: (TrainingPlanListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
+    onCreatePlan: () -> Unit = {}
 ) {
     val modalBottomSheetAlert = rememberModalBottomSheetAlert()
 
@@ -135,7 +138,7 @@ fun TrainingPlanListScreen(
                 modifier = Modifier
                     .layoutId(LayoutId.Fab)
                     .rotate(degrees = 360f * topBarStateHolder.topBarTransition),
-                onClick = { }
+                onClick = onCreatePlan
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = null)
             }
@@ -195,65 +198,78 @@ fun TrainingPlanListScreen(
         }
     }
 
-    ContentLoadingProgressBar(visible = uiState.value is AppState.Loading)
+    var isShowingLoading by rememberSaveable { mutableStateOf(false) }
+    ContentLoadingProgressBar(visible = isShowingLoading)
 
-    AppSuccessStateEffect(state = uiState.value) {
-        when (content) {
-            is TrainingPlanListState.DisplayUserData -> userData.value = content.user
-            is TrainingPlanListState.ShowPlanList -> {
-                isShowEmptyListMessage.value = false
-                trainingList.clear()
-                trainingList.addAll(content.plans)
-            }
-            is TrainingPlanListState.DisplayNoPlansToShowMessage -> {
-                isShowEmptyListMessage.value = true
-                isShowRefreshButton.value = true
-            }
-            is TrainingPlanListState.ConfirmPlanDeletion ->
-                modalBottomSheetAlert
-                    .showAlert(
-                        callId = planDeletionResources.id,
-                        type = ModalBottomSheetAlertState.ModalType.Question,
-                        title = planDeletionResources.title,
-                        message = planDeletionResources.message(content.plan.title),
-                        positiveButtonLabel = planDeletionResources.positiveButtonLabel,
-                        negativeButtonLabel = planDeletionResources.negativeButtonLabel
-                    )
-            is TrainingPlanListState.ShowLoginScreen -> onLoggedOut()
-            else -> Unit
-        }
-    }
-
-    AppErrorStateEffect(state = uiState.value) {
-        when (tag) {
-            is TrainingPlanListState.FetchUserDataTag,
-            is TrainingPlanListState.FetchPlanListTag,
-            is TrainingPlanListState.PerformLogoutTag,
-            is TrainingPlanListState.DeletePlanTag -> {
-                when (tag) {
-                    is TrainingPlanListState.FetchUserDataTag ->
-                        R.id.training_plan_list_fetch_user_error
-                    is TrainingPlanListState.FetchPlanListTag ->
-                        R.id.training_plan_list_error
-                    is TrainingPlanListState.PerformLogoutTag ->
-                        R.id.training_plan_list_logout_error
-                    is TrainingPlanListState.DeletePlanTag ->
-                        R.id.training_plan_list_delete_plan_error
-                    else -> 0
-                }.takeIf { it != 0 }?.also { callId ->
-                    when (cause) {
-                        is NoConnectivityException -> modalBottomSheetAlert
-                            .showConnectivityErrorAlert(
-                                callId = callId
-                            )
-                        else -> modalBottomSheetAlert
-                            .showGenericErrorAlert(
-                                callId = callId
-                            )
+    LaunchedEffect(Unit) {
+        uiState.collect { state ->
+            when (state) {
+                is AppState.Loading -> state.apply {
+                    isShowingLoading = true
+                }
+                is AppState.Loaded -> state.apply {
+                    isShowingLoading = false
+                }
+                is AppState.Success -> state.apply {
+                    when (content) {
+                        is TrainingPlanListState.DisplayUserData -> userData.value = content.user
+                        is TrainingPlanListState.ShowPlanList -> {
+                            isShowEmptyListMessage.value = false
+                            trainingList.clear()
+                            trainingList.addAll(content.plans)
+                        }
+                        is TrainingPlanListState.DisplayNoPlansToShowMessage -> {
+                            isShowEmptyListMessage.value = true
+                            isShowRefreshButton.value = true
+                        }
+                        is TrainingPlanListState.ConfirmPlanDeletion ->
+                            modalBottomSheetAlert
+                                .showAlert(
+                                    callId = planDeletionResources.id,
+                                    type = ModalBottomSheetAlertState.ModalType.Question,
+                                    title = planDeletionResources.title,
+                                    message = planDeletionResources.message(content.plan.title),
+                                    positiveButtonLabel = planDeletionResources.positiveButtonLabel,
+                                    negativeButtonLabel = planDeletionResources.negativeButtonLabel
+                                )
+                        is TrainingPlanListState.ShowLoginScreen -> onLoggedOut()
+                        else -> Unit
                     }
                 }
+                is AppState.Error -> state.apply {
+                    when (tag) {
+                        is TrainingPlanListState.FetchUserDataTag,
+                        is TrainingPlanListState.FetchPlanListTag,
+                        is TrainingPlanListState.PerformLogoutTag,
+                        is TrainingPlanListState.DeletePlanTag -> {
+                            when (tag) {
+                                is TrainingPlanListState.FetchUserDataTag ->
+                                    R.id.training_plan_list_fetch_user_error
+                                is TrainingPlanListState.FetchPlanListTag ->
+                                    R.id.training_plan_list_error
+                                is TrainingPlanListState.PerformLogoutTag ->
+                                    R.id.training_plan_list_logout_error
+                                is TrainingPlanListState.DeletePlanTag ->
+                                    R.id.training_plan_list_delete_plan_error
+                                else -> 0
+                            }.takeIf { it != 0 }?.also { callId ->
+                                when (cause) {
+                                    is NoConnectivityException -> modalBottomSheetAlert
+                                        .showConnectivityErrorAlert(
+                                            callId = callId
+                                        )
+                                    else -> modalBottomSheetAlert
+                                        .showGenericErrorAlert(
+                                            callId = callId
+                                        )
+                                }
+                            }
+                        }
+                        else -> Unit
+                    }
+                }
+                else -> Unit
             }
-            else -> Unit
         }
     }
 

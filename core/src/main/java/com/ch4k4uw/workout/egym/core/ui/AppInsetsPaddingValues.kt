@@ -6,13 +6,17 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.derivedWindowInsetsTypeOf
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 
 @Stable
@@ -20,13 +24,16 @@ class AppInsetsPaddingValues internal constructor(
     private val statusBarPaddingValues: PaddingValues,
     private val navigationBarPaddingValues: PaddingValues,
     private val layoutDirection: LayoutDirection = LayoutDirection.Ltr,
-    private var applyTop: Boolean = false,
-    private var applyBottom: Boolean = false,
-    private var applyStart: Boolean = false,
-    private var applyEnd: Boolean = false,
+    applyTop: Boolean = false,
+    applyBottom: Boolean = false,
+    applyStart: Boolean = false,
+    applyEnd: Boolean = false,
 ) {
-    private val mutablePaddingValues = mutableStateOf(createPaddingValues())
-    val paddingValues: State<PaddingValues> = mutablePaddingValues
+    private var applyTop by mutableStateOf(applyTop)
+    private var applyBottom by mutableStateOf(applyBottom)
+    private var applyStart by mutableStateOf(applyStart)
+    private var applyEnd by mutableStateOf(applyEnd)
+    val paddingValues = derivedStateOf { createPaddingValues() }
 
     fun enableInsets(
         statusBar: Boolean = true,
@@ -34,7 +41,6 @@ class AppInsetsPaddingValues internal constructor(
     ) {
         enableStatusBarPadding(enable = statusBar)
         enableNavigationBarsPadding(enable = navBar)
-        mutablePaddingValues.value = createPaddingValues()
     }
 
     private fun enableStatusBarPadding(enable: Boolean = true) {
@@ -65,7 +71,7 @@ class AppInsetsPaddingValues internal constructor(
     }
 
     companion object {
-        fun Saver(
+        fun saver(
             statusBarPaddingValues: PaddingValues,
             navigationBarPaddingValues: PaddingValues,
             layoutDirection: LayoutDirection = LayoutDirection.Ltr
@@ -101,18 +107,22 @@ class AppInsetsPaddingValues internal constructor(
 internal fun rememberAppInsetsPaddingValues(
     layoutDirection: LayoutDirection = LocalLayoutDirection.current
 ): AppInsetsPaddingValues {
+    val ime = LocalWindowInsets.current.ime
+    val navBars = LocalWindowInsets.current.navigationBars
+    val insets = remember(ime, navBars) { derivedWindowInsetsTypeOf(ime, navBars) }
+
     val statusBarPaddings = rememberInsetsPaddingValues(
         insets = LocalWindowInsets.current.statusBars,
         applyTop = true
     )
     val navigationBarPaddings = rememberInsetsPaddingValues(
-        insets = LocalWindowInsets.current.navigationBars,
+        insets = insets,
         applyStart = true,
         applyEnd = true,
-        applyBottom = true,
+        applyBottom = true
     )
     return rememberSaveable(
-        saver = AppInsetsPaddingValues.Saver(
+        saver = AppInsetsPaddingValues.saver(
             statusBarPaddingValues = statusBarPaddings,
             navigationBarPaddingValues = navigationBarPaddings,
             layoutDirection = layoutDirection

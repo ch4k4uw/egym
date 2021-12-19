@@ -28,6 +28,7 @@ subprojects {
                 "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
                 "-Xopt-in=androidx.compose.ui.unit.ExperimentalUnitApi",
                 "-Xopt-in=kotlinx.coroutines.FlowPreview",
+                "-Xopt-in=com.google.accompanist.pager.ExperimentalPagerApi",
             )
             jvmTarget = "1.8"
         }

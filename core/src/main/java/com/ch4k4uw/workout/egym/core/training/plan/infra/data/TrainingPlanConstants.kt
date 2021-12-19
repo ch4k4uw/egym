@@ -15,6 +15,7 @@ object TrainingPlanConstants {
         const val UserId = "uid"
         const val Title = "title"
         const val Description = "description"
+        const val Exercises = "exercises"
         const val Created = "created"
         const val Updated = "updated"
     }

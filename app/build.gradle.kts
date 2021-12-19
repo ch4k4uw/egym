@@ -106,6 +106,7 @@ dependencies {
     implementation(Libraries.Accompanist.Insets)
     implementation(Libraries.Accompanist.SysUIController)
     implementation(Libraries.Accompanist.FlowLayout)
+    implementation(Libraries.Accompanist.HorizontalPager)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:core:1.4.0")

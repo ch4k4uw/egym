@@ -7,7 +7,8 @@ fun TrainingPlan.toView(): TrainingPlanView =
     TrainingPlanView(
         id = id,
         title = title,
-        description = description
+        description = description,
+        exercises = exercises.toView()
     )
 
 fun List<TrainingPlan>.toView(): List<TrainingPlanView> =

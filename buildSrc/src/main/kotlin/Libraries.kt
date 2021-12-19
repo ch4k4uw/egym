@@ -59,6 +59,7 @@ object Libraries {
         const val Insets = "com.google.accompanist:accompanist-insets:${Versions.Accompanist}"
         const val InsetsUi = "com.google.accompanist:accompanist-insets-ui:${Versions.Accompanist}"
         const val FlowLayout = "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist}"
+        const val HorizontalPager = "com.google.accompanist:accompanist-pager:${Versions.Accompanist}"
     }
     object Retrofit {
         const val Retrofit = "com.squareup.retrofit2:retrofit:${Versions.Retrofit}"

@@ -11,7 +11,8 @@ sealed class Screen(
     val route: String,
     @StringRes val label: Int = 0,
     val icon: ImageVector? = null,
-    val parent: Screen? = null
+    val parent: Screen? = null,
+    val args: List<Triple<String, Boolean, Any?>> = listOf(),
 ) {
     object Login : Screen(route = "login")
     object Home : Screen(route = "home") {
@@ -41,6 +42,23 @@ sealed class Screen(
             object List : Screen(
                 route = "home/plan/list"
             )
+            object Register : Screen(
+                route = "home/plan/register?planMetadata={planMetadata}",
+                args = listOf<Triple<String, Boolean, Any?>>(
+                    Triple("planMetadata", true, null as String?)
+                )
+            ) {
+                fun route(planMetadata: String?) =
+                    planMetadata
+                        ?.let { route.replace("{planMetadata}", it) }
+                        ?: route.substring(0 until route.lastIndexOf('?'))
+            }
+            object Detail : Screen(
+                route = "home/plan/exercise/detail/{exerciseId}"
+            ) {
+                fun route(exerciseId: String) =
+                    route.replace("{exerciseId}", exerciseId)
+            }
         }
     }
 }

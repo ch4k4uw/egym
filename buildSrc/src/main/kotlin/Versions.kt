@@ -6,7 +6,7 @@ object Versions {
         const val CoroutinesPlayServices = "1.5.1"
     }
     object Compose {
-        const val Compose = "1.0.5"
+        const val Compose = "1.1.0-beta02"
         const val ConstraintLayout = "1.0.0-rc01"
         const val ActivityKtx = "1.3.1"
         const val Activity = "1.3.1"

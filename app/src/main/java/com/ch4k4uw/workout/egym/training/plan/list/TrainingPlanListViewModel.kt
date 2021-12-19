@@ -32,8 +32,6 @@ class TrainingPlanListViewModel @Inject constructor(
         viewModelScope.launch {
             emitLoading()
             findLoggedUser()
-            emitLoaded()
-            emitLoading()
             findTrainingPlanList()
             emitLoaded()
         }
@@ -79,35 +77,22 @@ class TrainingPlanListViewModel @Inject constructor(
     }
 
     override fun performIntent(intent: TrainingPlanListIntent) {
-        when (intent) {
-            is TrainingPlanListIntent.PerformLogout -> viewModelScope.launch {
-                emitLoading()
-                performLogout()
-                emitLoaded()
-            }
-            is TrainingPlanListIntent.FetchUserData -> viewModelScope.launch {
-                emitLoading()
-                findLoggedUser()
-                emitLoaded()
-            }
-            is TrainingPlanListIntent.FetchPlanList -> viewModelScope.launch {
-                emitLoading()
-                findTrainingPlanList()
-                emitLoaded()
-            }
-            is TrainingPlanListIntent.DeletePlan -> {
-                viewModelScope.launch {
-                    if (intent.confirmed) {
-                        emitLoading()
-                        deletePlan(id = intent.plan.id)
-                        emitLoaded()
-                    } else {
-                        emitSuccess(
-                            value = TrainingPlanListState.ConfirmPlanDeletion(plan = intent.plan)
-                        )
-                    }
+        viewModelScope.launch {
+            emitLoading()
+            when (intent) {
+                is TrainingPlanListIntent.PerformLogout -> performLogout()
+                is TrainingPlanListIntent.FetchUserData -> findLoggedUser()
+                is TrainingPlanListIntent.FetchPlanList -> findTrainingPlanList()
+                is TrainingPlanListIntent.DeletePlan -> if (intent.confirmed) {
+                    deletePlan(id = intent.plan.id)
+                } else {
+                    emitSuccess(
+                        value = TrainingPlanListState.ConfirmPlanDeletion(plan = intent.plan)
+                    )
                 }
+
             }
+            emitLoaded()
         }
     }
 

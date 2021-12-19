@@ -7,6 +7,7 @@ internal data class TrainingPlanRemote(
     var id: String = "",
     var title: String = "",
     var description: String = "",
+    var exercises: List<TrainingPlanExerciseRemote> = listOf(),
     var created: Long = 0,
     var updated: Long = 0
 )
@@ -16,6 +17,7 @@ internal fun TrainingPlanRemote.toDomain(): TrainingPlan =
         id = id,
         title = title,
         description = description,
+        exercises = exercises.map { it.toDomain() },
         created = created.asLocalDateTime,
         updated = updated.asLocalDateTime,
     )

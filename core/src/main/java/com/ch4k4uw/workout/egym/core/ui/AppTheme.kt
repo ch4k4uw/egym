@@ -89,7 +89,7 @@ fun AppTheme(
             typography = typography.material,
             shapes = shapes.material
         ) {
-            ProvideWindowInsets {
+            ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
                 val insetsPaddingValues = rememberAppInsetsPaddingValues()
                 CompositionLocalProvider(
                     LocalAppInsetsPaddingValues provides insetsPaddingValues

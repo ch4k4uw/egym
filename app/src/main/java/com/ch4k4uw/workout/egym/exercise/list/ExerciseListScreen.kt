@@ -2,7 +2,7 @@ package com.ch4k4uw.workout.egym.exercise.list
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +35,9 @@ import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListListSlot
 import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListTopAppBarSlot
 import com.ch4k4uw.workout.egym.exercise.list.ui.component.ExerciseListTopTagChipBarSlot
-import com.ch4k4uw.workout.egym.extensions.handleError
-import com.ch4k4uw.workout.egym.extensions.handleSuccess
-import com.ch4k4uw.workout.egym.extensions.isLoading
-import com.ch4k4uw.workout.egym.extensions.raiseEvent
 import com.ch4k4uw.workout.egym.login.interaction.UserView
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlin.math.roundToInt
 
 private enum class LayoutId {
@@ -50,7 +48,7 @@ private enum class LayoutId {
 @ExperimentalUnitApi
 @Composable
 fun ExerciseListScreen(
-    uiState: State<AppState<ExerciseListState>>,
+    uiState: Flow<AppState<ExerciseListState>>,
     onIntent: (ExerciseListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
@@ -94,43 +92,9 @@ fun ExerciseListScreen(
     val queryText = rememberSaveable { mutableStateOf("") }
     val isLoadingStateForced = rememberSaveable { mutableStateOf(false) }
     val isResetQueryRequired = rememberSaveable { mutableStateOf(false) }
+    val isLoadingList = rememberSaveable { mutableStateOf(false) }
 
     val modalBottomSheetAlert = rememberModalBottomSheetAlert()
-
-    if (uiState.isLoading) {
-        isLoadingStateForced.value = false
-    }
-
-    uiState.raiseEvent().apply {
-        handleSuccess {
-            when (content) {
-                is ExerciseListState.DisplayUserData -> userData.value = content.user
-                is ExerciseListState.ShowLoginScreen -> onLoggedOut()
-                is ExerciseListState.ShowExerciseList -> with(exercisesHeads) {
-                    clear()
-                    addAll(content.exercises)
-                }
-                is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer.value = false
-                is ExerciseListState.ShowExerciseTagList -> with(exerciseTags) {
-                    clear()
-                    addAll(content.tags.map { Pair(it, false) })
-                }
-                else -> Unit
-            }
-        }
-        handleError {
-            when (cause) {
-                is NoConnectivityException -> modalBottomSheetAlert
-                    .showConnectivityErrorAlert(
-                        callId = R.id.connectivity_exercise_list_error
-                    )
-                else -> modalBottomSheetAlert
-                    .showGenericErrorAlert(
-                        callId = R.id.generic_exercise_list_error
-                    )
-            }
-        }
-    }
 
     Layout(
         modifier = Modifier
@@ -161,7 +125,7 @@ fun ExerciseListScreen(
             )
             ExerciseListListSlot(
                 modifier = Modifier.layoutId(layoutId = LayoutId.List),
-                uiState = uiState,
+                isLoadingList = isLoadingList.value,
                 isLoadingStateForced = isLoadingStateForced,
                 exercisesHeads = exercisesHeads,
                 showShimmer = showShimmer,
@@ -225,6 +189,53 @@ fun ExerciseListScreen(
             onDismissRequest = { isProfileDialogShowing.value = false },
             onLogout = { onIntent(ExerciseListIntent.PerformLogout) }
         )
+    }
+
+    LaunchedEffect(Unit) {
+        uiState.collect { state ->
+            when (state) {
+                is AppState.Loading -> state.apply {
+                    isLoadingStateForced.value = false
+                    isLoadingList.value = tag is ExerciseListState.ExerciseListTag
+                }
+                is AppState.Loaded -> state.apply {
+                    isLoadingList.value = if(tag is ExerciseListState.ExerciseListTag) {
+                        false
+                    } else {
+                        isLoadingList.value
+                    }
+                }
+                is AppState.Success -> state.apply {
+                    when (content) {
+                        is ExerciseListState.DisplayUserData -> userData.value = content.user
+                        is ExerciseListState.ShowLoginScreen -> onLoggedOut()
+                        is ExerciseListState.ShowExerciseList -> with(exercisesHeads) {
+                            clear()
+                            addAll(content.exercises)
+                        }
+                        is ExerciseListState.ShowNoMorePagesToFetch -> showShimmer.value = false
+                        is ExerciseListState.ShowExerciseTagList -> with(exerciseTags) {
+                            clear()
+                            addAll(content.tags.map { Pair(it, false) })
+                        }
+                        else -> Unit
+                    }
+                }
+                is AppState.Error -> state.apply {
+                    when (cause) {
+                        is NoConnectivityException -> modalBottomSheetAlert
+                            .showConnectivityErrorAlert(
+                                callId = R.id.connectivity_exercise_list_error
+                            )
+                        else -> modalBottomSheetAlert
+                            .showGenericErrorAlert(
+                                callId = R.id.generic_exercise_list_error
+                            )
+                    }
+                }
+                else -> Unit
+            }
+        }
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {

@@ -30,6 +30,11 @@ fun Navigation() {
                 }
                 trainingPlanNestedNavigation {
                     trainingPlanListNavigation(navigationState = navigationState)
+                    trainingPlanRegisterNavigation(navigationState = navigationState)
+                    exerciseDetailNavigation(
+                        route = Screen.Home.Plan.Detail.route,
+                        navigationState = navigationState
+                    )
                 }
             }
         }

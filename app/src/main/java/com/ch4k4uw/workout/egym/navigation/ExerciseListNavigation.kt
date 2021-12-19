@@ -5,7 +5,6 @@ import androidx.navigation.compose.composable
 import com.ch4k4uw.workout.egym.exercise.list.ExerciseListScreen
 import com.ch4k4uw.workout.egym.exercise.list.ExerciseListViewModel
 import com.ch4k4uw.workout.egym.extensions.RestoreWindowBarsEffect
-import com.ch4k4uw.workout.egym.extensions.collectAsBufferedState
 import com.ch4k4uw.workout.egym.extensions.viewModel
 
 fun NavGraphBuilder.exerciseListNavigation(navigationState: NavigationState) {
@@ -14,7 +13,7 @@ fun NavGraphBuilder.exerciseListNavigation(navigationState: NavigationState) {
     ) { navBackStackEntry ->
         val viewModel: ExerciseListViewModel = navBackStackEntry.viewModel()
         ExerciseListScreen(
-            uiState = viewModel.uiState.collectAsBufferedState(),
+            uiState = viewModel.uiState,
             onIntent = viewModel::performIntent,
             onLoggedOut = {
                 navigationState.navController
@@ -37,9 +36,7 @@ fun NavGraphBuilder.exerciseListNavigation(navigationState: NavigationState) {
                 navigationState.navController
                     .navigate(
                         route = Screen.Home.Exercise.Detail.route(it)
-                    ) {
-                        restoreState = true
-                    }
+                    )
             }
         )
         RestoreWindowBarsEffect(navigationState = navigationState)

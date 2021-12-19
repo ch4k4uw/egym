@@ -79,6 +79,7 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
                 id = doc.id,
                 title = entity.title,
                 description = entity.description,
+                exercises = entity.exercises,
                 created = now,
                 updated = now
             )
@@ -101,6 +102,7 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
             TrainingPlanConstants.Field.UserId to userId,
             TrainingPlanConstants.Field.Title to title,
             TrainingPlanConstants.Field.Description to description,
+            TrainingPlanConstants.Field.Exercises to exercises,
             TrainingPlanConstants.Field.Created to created.asMilliseconds,
             TrainingPlanConstants.Field.Updated to updated.asMilliseconds,
         )
@@ -114,6 +116,7 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
                 id = doc.id,
                 title = entity.title,
                 description = entity.description,
+                exercises = entity.exercises,
                 updated = now
             )
 
@@ -135,6 +138,7 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
         hashMapOf(
             TrainingPlanConstants.Field.Title to title,
             TrainingPlanConstants.Field.Description to description,
+            TrainingPlanConstants.Field.Exercises to exercises,
             TrainingPlanConstants.Field.Updated to updated.asMilliseconds,
         )
 

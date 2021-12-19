@@ -12,7 +12,6 @@ import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListIntent
 import com.ch4k4uw.workout.egym.exercise.list.interaction.ExerciseListState
 import com.ch4k4uw.workout.egym.login.extensions.toView
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -24,7 +23,6 @@ import kotlinx.coroutines.yield
 import timber.log.Timber
 import javax.inject.Inject
 
-@FlowPreview
 @HiltViewModel
 class ExerciseListViewModel @Inject constructor(
     private val exerciseListInteractor: ExerciseListInteractor

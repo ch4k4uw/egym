@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +60,8 @@ import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseDetailState
 import com.ch4k4uw.workout.egym.exercise.detail.interaction.ExerciseView
 import com.ch4k4uw.workout.egym.exercise.detail.ui.component.rememberSaveableCollapsingTopBar
 import com.ch4k4uw.workout.egym.exercise.interaction.ExerciseViewSaver
-import com.ch4k4uw.workout.egym.extensions.asSuccess
-import com.ch4k4uw.workout.egym.extensions.handleError
-import com.ch4k4uw.workout.egym.extensions.isLoading
-import com.ch4k4uw.workout.egym.extensions.raiseEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlin.math.roundToInt
 
 private enum class LayoutId {
@@ -84,16 +82,12 @@ private val TitleIconWith = 72.dp
 @ExperimentalUnitApi
 @Composable
 fun ExerciseDetailScreen(
-    uiState: State<AppState<ExerciseDetailState>>,
+    uiState: Flow<AppState<ExerciseDetailState>>,
     onShowExerciseList: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onIntent: (ExerciseDetailIntent) -> Unit = {}
 ) {
-    val isLoading by remember {
-        derivedStateOf {
-            uiState.isLoading
-        }
-    }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
     var exerciseDetail by rememberSaveable(saver = ExerciseViewSaver.Saver) {
         mutableStateOf(ExerciseView.Empty)
     }
@@ -106,28 +100,6 @@ fun ExerciseDetailScreen(
     val stateHolder = rememberSaveableCollapsingTopBar()
 
     val modalBottomSheetAlert = rememberModalBottomSheetAlert()
-
-    uiState.value.asSuccess()?.apply {
-        when (content) {
-            is ExerciseDetailState.ShowDetail -> exerciseDetail = content.detail
-            else -> Unit
-        }
-    }
-
-    uiState.raiseEvent().apply {
-        handleError {
-            when (cause) {
-                is NoConnectivityException -> modalBottomSheetAlert
-                    .showConnectivityErrorAlert(
-                        callId = R.id.connectivity_exercise_detail_error
-                    )
-                else -> modalBottomSheetAlert
-                    .showGenericErrorAlert(
-                        callId = R.id.generic_exercise_detail_error
-                    )
-            }
-        }
-    }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -382,6 +354,38 @@ fun ExerciseDetailScreen(
                 }
 
                 LayoutId.values().forEach { placeStack[it.ordinal]?.invoke() }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        uiState.collect { state ->
+            when (state) {
+                is AppState.Loading -> state.apply {
+                    isLoading = true
+                }
+                is AppState.Loaded -> state.apply {
+                    isLoading = false
+                }
+                is AppState.Success -> state.apply {
+                    when (content) {
+                        is ExerciseDetailState.ShowDetail -> exerciseDetail = content.detail
+                        else -> Unit
+                    }
+                }
+                is AppState.Error -> state.apply {
+                    when (cause) {
+                        is NoConnectivityException -> modalBottomSheetAlert
+                            .showConnectivityErrorAlert(
+                                callId = R.id.connectivity_exercise_detail_error
+                            )
+                        else -> modalBottomSheetAlert
+                            .showGenericErrorAlert(
+                                callId = R.id.generic_exercise_detail_error
+                            )
+                    }
+                }
+                else -> Unit
             }
         }
     }

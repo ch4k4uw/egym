@@ -2,6 +2,7 @@ package com.ch4k4uw.workout.egym.common.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -25,11 +26,12 @@ import com.ch4k4uw.workout.egym.login.interaction.UserView
 fun GenericTopAppBar(
     modifier: Modifier,
     title: String,
-    userData: UserView,
+    actionIcons: (@Composable RowScope.() -> Unit)? = null,
+    userData: UserView? = null,
     queryText: String = "",
     onNavigateBack: () -> Unit,
     onSearchButtonClick: (() -> Unit)? = null,
-    onLogoutClick: () -> Unit,
+    onLogoutClick: () -> Unit = {},
 ) {
     val isProfileDialogShowing = remember { mutableStateOf(false) }
     TopAppBar(
@@ -67,21 +69,27 @@ fun GenericTopAppBar(
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                 }
             }
-            IconButton(onClick = { isProfileDialogShowing.value = true }) {
-                RemoteIcon(
-                    url = userData.image,
-                    default = Icons.Filled.Person,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(all = AppTheme.Dimens.spacing.tiny)
-                        .clip(CircleShape)
-                        .background(color = AppTheme.colors.material.onPrimary)
-                )
+            if (actionIcons != null) {
+                actionIcons()
+            } else {
+                if (userData != null) {
+                    IconButton(onClick = { isProfileDialogShowing.value = true }) {
+                        RemoteIcon(
+                            url = userData.image,
+                            default = Icons.Filled.Person,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(all = AppTheme.Dimens.spacing.tiny)
+                                .clip(CircleShape)
+                                .background(color = AppTheme.colors.material.onPrimary)
+                        )
+                    }
+                }
             }
         }
     )
 
-    if (isProfileDialogShowing.value) {
+    if (isProfileDialogShowing.value && userData != null) {
         ProfileDialog(
             image = userData.image,
             name = userData.name,

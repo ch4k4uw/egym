@@ -37,4 +37,24 @@
     <string name="training_plan_delete_plan_warning_message">Are you sure you want to delete the \"%1$s\" plan?</string>
     <string name="training_plan_delete_plan_warning_positive_button">DELETE</string>
     <string name="training_plan_delete_plan_warning_negative_button">Keep it</string>
+
+    <string name="training_plan_exercise_card_sets_and_resp_label">%1$d sets, of %2$d reps.</string>
+
+    <string name="training_plan_exercise_edition_notes_label">Notes</string>
+    <string name="training_plan_exercise_edition_sets_label">Sets</string>
+    <string name="training_plan_exercise_edition_reps_label">Reps</string>
+    <string name="training_plan_exercise_edition_confirm_action_label">CONFIRM</string>
+
+    <string name="training_plan_register_title">Training plan</string>
+    <string name="training_plan_register_next_button_label">NEXT</string>
+    <string name="training_plan_register_finish_button_label">SAVE</string>
+    <string name="training_plan_register_back_action_confirmation_title">Action confirmation</string>
+    <string name="training_plan_register_back_action_confirmation_message">Are you sure to leave without save this plan?</string>
+    <string name="training_plan_register_back_action_confirmation_positive_button">EXIT</string>
+    <string name="training_plan_register_back_action_confirmation_negative_button">Don\'t leave</string>
+    <string name="training_plan_register_form_plan_title_label">Title</string>
+    <string name="training_plan_register_form_plan_title_tip">A short plan title to help you quickly identify when, or how, achieve this plan goal.</string>
+    <string name="training_plan_register_form_plan_description_label">Description</string>
+    <string name="training_plan_register_form_plan_description_tip">A more detailed way to identify this plan. You can put useful information about how to perform the exercises, the reasons to create this plan or anything else that can help you to achieve your goals.</string>
+    <string name="training_plan_register_form_plan_exercises_label">Exercises</string>
 </resources>

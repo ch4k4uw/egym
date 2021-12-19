@@ -6,14 +6,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
 import com.ch4k4uw.workout.egym.common.domain.DecodeFromRouteService
 
 @Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.viewModel(): T {
+inline fun <reified T : ViewModel> NavBackStackEntry?.viewModel(): T? = this?.let {
+    viewModel(viewModelStoreOwner = it)
+}
+
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.viewModel(
+    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    }
+): T {
     val factory = HiltViewModelFactory(LocalContext.current, this)
     return androidx.lifecycle.viewmodel.compose.viewModel(
-        key = T::class.java.simpleName, factory = factory
+        viewModelStoreOwner = viewModelStoreOwner, key = T::class.java.name, factory = factory
     )
 }
 
