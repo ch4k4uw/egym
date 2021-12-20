@@ -377,11 +377,11 @@ fun ExerciseDetailScreen(
                     when (cause) {
                         is NoConnectivityException -> modalBottomSheetAlert
                             .showConnectivityErrorAlert(
-                                callId = R.id.connectivity_exercise_detail_error
+                                callId = R.id.exercise_detail_connectivity_error
                             )
                         else -> modalBottomSheetAlert
                             .showGenericErrorAlert(
-                                callId = R.id.generic_exercise_detail_error
+                                callId = R.id.exercise_detail_generic_error
                             )
                     }
                 }
@@ -391,7 +391,7 @@ fun ExerciseDetailScreen(
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
-        asClickedState(R.id.connectivity_exercise_detail_error, R.id.generic_exercise_detail_error) {
+        asClickedState(R.id.exercise_detail_connectivity_error, R.id.exercise_detail_generic_error) {
             hide()
             when (this) {
                 is ModalBottomSheetAlertResultState.PositiveClicked ->

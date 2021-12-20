@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 @Composable
 fun Navigation() {
     val navigationState = rememberNavigationState()
-
     BottomBarNavigation(
         navController = navigationState.navController,
         show = navigationState.isShowBottomNavigator,

@@ -8,14 +8,18 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ch4k4uw.workout.egym.injection.RouteEncodeEntryPoint
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.EntryPoints
 
 @Stable
 class NavigationState(
     val isDark: Boolean,
+    val routeEncode: RouteEncodeEntryPoint,
     val systemUiController: SystemUiController,
     val navController: NavHostController,
     isShowBottomNavigator: Boolean,
@@ -40,12 +44,19 @@ fun rememberNavigationState(
     navController: NavHostController = rememberNavController(),
     isShowBottomNavigator: Boolean = false,
     backPressOwner: OnBackPressedDispatcherOwner? = LocalOnBackPressedDispatcherOwner.current
-) = remember(key1 = isDark) {
-    NavigationState(
-        isDark = isDark,
-        systemUiController = systemUiController,
-        navController = navController,
-        isShowBottomNavigator = isShowBottomNavigator,
-        backPressOwner = backPressOwner
-    )
+): NavigationState {
+    val context = LocalContext.current
+    val routeEncode = remember(context) {
+        EntryPoints.get(context.applicationContext, RouteEncodeEntryPoint::class.java)
+    }
+    return remember(isDark, routeEncode) {
+        NavigationState(
+            isDark = isDark,
+            routeEncode = routeEncode,
+            systemUiController = systemUiController,
+            navController = navController,
+            isShowBottomNavigator = isShowBottomNavigator,
+            backPressOwner = backPressOwner
+        )
+    }
 }

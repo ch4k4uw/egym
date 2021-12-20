@@ -77,7 +77,7 @@ fun LoginScreen(
 
     val bkgAnim = rememberBkgAnimation()
     val screenWidthPx = LocalContext.current.resources.displayMetrics.widthPixels
-    var showInteractionControls by rememberSaveable { mutableStateOf(true) }// !isLoading && !uiState.isIdle && (uiState.value as? AppState.Success<LoginState>)?.content !is LoginState.ShowSignedInUser
+    var showInteractionControls by rememberSaveable { mutableStateOf(false) }
     val interactionControlsAlpha by animateFloatAsState(
         targetValue = if (!showInteractionControls) 0f else 1f,
         animationSpec = tween(durationMillis = 300)
@@ -181,7 +181,7 @@ fun LoginScreen(
                 }
                 is AppState.Error -> state.apply {
                     modalBottomSheetAlert
-                        .showGenericErrorAlert(callId = R.id.generic_login_error)
+                        .showGenericErrorAlert(callId = R.id.login_generic_error)
                 }
                 else -> Unit
             }
@@ -195,7 +195,7 @@ fun LoginScreen(
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
-        asClickedState(R.id.generic_login_error) {
+        asClickedState(R.id.login_generic_error) {
             hide()
             when (this) {
                 is ModalBottomSheetAlertResultState.PositiveClicked ->

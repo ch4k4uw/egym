@@ -57,4 +57,7 @@
     <string name="training_plan_register_form_plan_description_label">Description</string>
     <string name="training_plan_register_form_plan_description_tip">A more detailed way to identify this plan. You can put useful information about how to perform the exercises, the reasons to create this plan or anything else that can help you to achieve your goals.</string>
     <string name="training_plan_register_form_plan_exercises_label">Exercises</string>
+    <string name="training_plan_register_successful_saved_title">Success</string>
+    <string name="training_plan_register_successful_saved_message">Success</string>
+    <string name="training_plan_register_successful_saved_positive_button">UNDERSTOOD!</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,11 +61,13 @@ fun TrainingPlanExerciseCard(
     notes: String = "",
     sets: Int = 0,
     reps: Int = 0,
+    performTip: Boolean = true,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onDetailsClick: () -> Unit = {},
 ) {
-    var cardOffset by remember { mutableStateOf(0f) }
+    var innerPerformTip by rememberSaveable { mutableStateOf(performTip) }
+    var cardOffset by rememberSaveable { mutableStateOf(0f) }
     val transitionState = remember {
         MutableTransitionState(false)
     }
@@ -224,10 +227,13 @@ fun TrainingPlanExerciseCard(
         }
     }
 
-    LaunchedEffect(key1 = true) {
-        transitionState.targetState = true
-        delay(timeMillis = ANIMATION_DURATION.toLong())
-        transitionState.targetState = false
+    LaunchedEffect(Unit) {
+        if (innerPerformTip) {
+            transitionState.targetState = true
+            delay(timeMillis = ANIMATION_DURATION.toLong())
+            transitionState.targetState = false
+            innerPerformTip = false
+        }
     }
 }
 

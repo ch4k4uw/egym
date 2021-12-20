@@ -30,6 +30,11 @@ fun NavGraphBuilder.trainingPlanListNavigation(navigationState: NavigationState)
                     ?.onBackPressedDispatcher
                     ?.onBackPressed()
             },
+            onEditPlan = {
+                val planMetadata = navigationState.routeEncode.encodeToRoute.encode(entity = it)
+                navigationState.navController
+                    .navigate(route = Screen.Home.Plan.Register.route(planMetadata = planMetadata))
+            },
             onCreatePlan = {
                 navigationState.navController
                     .navigate(route = Screen.Home.Plan.Register.route(planMetadata = null))

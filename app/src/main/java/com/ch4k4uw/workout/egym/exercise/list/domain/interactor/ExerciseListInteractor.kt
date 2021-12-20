@@ -25,8 +25,7 @@ class ExerciseListInteractor @Inject constructor(
     ): Flow<ExerciseHeadPager> =
         exerciseRepository.findHeadsPager(
             query = query,
-            tags = tags,
-            options = ExercisePagerOptions(size = 5)
+            tags = tags
         )
 
     suspend fun findLoggedUser(): Flow<User> =

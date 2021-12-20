@@ -60,6 +60,7 @@ fun TrainingPlanListScreen(
     onIntent: (TrainingPlanListIntent) -> Unit = {},
     onLoggedOut: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
+    onEditPlan: (TrainingPlanView) -> Unit = {},
     onCreatePlan: () -> Unit = {}
 ) {
     val modalBottomSheetAlert = rememberModalBottomSheetAlert()
@@ -115,7 +116,9 @@ fun TrainingPlanListScreen(
                                     title = trainingList[index].title,
                                     description = trainingList[index].description,
                                     onClick = { },
-                                    onEditClick = { },
+                                    onEditClick = {
+                                        onEditPlan(trainingList[index])
+                                    },
                                     onDeleteClick = {
                                         planToDelete.value = trainingList[index]
                                         onIntent(

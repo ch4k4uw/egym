@@ -41,6 +41,7 @@ class TrainingPlanCmdRepositoryImpl @Inject constructor(
         val entities = suspendCancellableCoroutine<List<TrainingPlan>> { continuation ->
             collRef
                 .whereEqualTo(TrainingPlanConstants.Field.UserId, user.id)
+                .orderBy(TrainingPlanConstants.Field.Created)
                 .get()
                 .addOnSuccessListener { snapshot ->
                     try {

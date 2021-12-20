@@ -8,14 +8,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.primarySurface
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,10 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.common.ui.component.GenericTopAppBar
+import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
 import com.ch4k4uw.workout.egym.core.extensions.asClickedState
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.core.ui.components.ContentLoadingProgressBar
@@ -50,8 +58,10 @@ import com.ch4k4uw.workout.egym.training.plan.register.interaction.TrainingPlanE
 import com.ch4k4uw.workout.egym.training.plan.register.interaction.TrainingPlanRegisterIntent
 import com.ch4k4uw.workout.egym.training.plan.register.interaction.TrainingPlanRegisterState
 import com.ch4k4uw.workout.egym.training.plan.register.interaction.TrainingPlanState
+import com.ch4k4uw.workout.egym.training.plan.register.interaction.fromView
 import com.ch4k4uw.workout.egym.training.plan.register.interaction.rememberSaveableTrainingPlanExerciseEditionState
-import com.ch4k4uw.workout.egym.training.plan.register.interaction.rememberTrainingPlanState
+import com.ch4k4uw.workout.egym.training.plan.register.interaction.rememberSaveableTrainingPlanState
+import com.ch4k4uw.workout.egym.training.plan.register.interaction.toView
 import com.ch4k4uw.workout.egym.training.plan.register.ui.TrainingPlanExerciseEdition
 import com.ch4k4uw.workout.egym.training.plan.register.ui.TrainingPlanRegisterSwipeForm
 import kotlinx.coroutines.flow.Flow
@@ -74,18 +84,18 @@ fun TrainingPlanRegisterScreen(
     val modalExerciseEditionState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
-    val trainingPlanSource = rememberSaveable { mutableStateOf(TrainingPlanView.Empty) }
-    val trainingPlanState = rememberTrainingPlanState(source = trainingPlanSource)
+    val trainingPlanState = rememberSaveableTrainingPlanState()
 
     val selectedTrainingExercise = rememberSaveableTrainingPlanExerciseEditionState()
     val exercisesSuggestions = rememberSaveable(saver = createSerializableStateListSaver()) {
         mutableStateListOf<Pair<String, String>>()
     }
+    var performExerciseTip by rememberSaveable { mutableStateOf(false) }
 
     var initialState by rememberSaveable { mutableStateOf("") }
     val askForSave by remember {
         derivedStateOf {
-            initialState != calculateState(plan = trainingPlanSource.value)
+            initialState != calculateState(plan = trainingPlanState.toView())
         }
     }
 
@@ -95,26 +105,22 @@ fun TrainingPlanRegisterScreen(
         sheetState = modalExerciseEditionState,
         sheetContent = {
             TrainingPlanExerciseEdition(
-                notes = selectedTrainingExercise.notes.value,
-                sets = selectedTrainingExercise.sets.value,
-                reps = selectedTrainingExercise.reps.value,
+                state = selectedTrainingExercise,
                 onConfirmClick = { notes, sets, reps ->
                     coroutineScope.launch {
                         modalExerciseEditionState.hide()
                     }
-                    val index = trainingPlanSource.value.exercises
+                    val index = trainingPlanState.exercises.value
                         .indexOfFirst { it.exercise == selectedTrainingExercise.exercise.value }
                     if (index >= 0) {
-                        with(trainingPlanSource.value) {
-                            trainingPlanSource.value = copy(
-                                exercises = exercises.toMutableList().apply {
-                                    this[index] = this[index].copy(
-                                        notes = notes,
-                                        sets = sets,
-                                        reps = reps
-                                    )
-                                }
-                            )
+                        with(trainingPlanState) {
+                            exercises.value = exercises.value.toMutableList().apply {
+                                this[index] = this[index].copy(
+                                    notes = notes,
+                                    sets = sets,
+                                    reps = reps
+                                )
+                            }
                         }
                     }
                 },
@@ -124,7 +130,11 @@ fun TrainingPlanRegisterScreen(
                     }
                 }
             )
-        }
+        },
+        sheetShape = RoundedCornerShape(
+            topStart = AppTheme.Dimens.sizing.small,
+            topEnd = AppTheme.Dimens.sizing.small,
+        )
     ) {
         Column(
             modifier = Modifier
@@ -133,7 +143,7 @@ fun TrainingPlanRegisterScreen(
             var currentFormPage by rememberSaveable { mutableStateOf(0) }
             val nextButtonEnableState = remember {
                 derivedStateOf {
-                    val isValidTitle = trainingPlanState.title.value.isNotBlank()
+                    val isValidTitle = trainingPlanState.title.value.text.isNotBlank()
                     val isNotEndPage = currentFormPage < 2
                     val isValidExercises = trainingPlanState.exercises.value.isNotEmpty()
                     isValidTitle && (isNotEndPage || isValidExercises)
@@ -144,7 +154,24 @@ fun TrainingPlanRegisterScreen(
                 modalBottomSheetAlert = modalBottomSheetAlert,
                 focusManager = focusManager,
                 askForSave = askForSave,
-                onPreviousPage = { (currentFormPage > 0).also { if (it) --currentFormPage } },
+                onSaveClick = {
+                    onIntent(
+                        TrainingPlanRegisterIntent.SavePlan(plan = trainingPlanState.toView())
+                    )
+                },
+                onPreviousPage = {
+                    if (modalExerciseEditionState.isVisible) {
+                        coroutineScope.launch { modalExerciseEditionState.hide() }
+                        true
+                    } else {
+                        if (currentFormPage > 0) {
+                            --currentFormPage
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                },
                 onNavigateBack = onNavigateBack
             )
             //region swipe-form
@@ -184,40 +211,47 @@ fun TrainingPlanRegisterScreen(
                         }
                     }.value,
                     exercisesSuggestions = exercisesSuggestions,
+                    performExerciseTip = performExerciseTip,
                     onTitleChange = {
-                        trainingPlanSource.value = trainingPlanSource.value.copy(
-                            title = it
-                        )
+                        trainingPlanState.title.value = it
                     },
                     onConfirmTitleAction = {
                         if (nextButtonEnableState.value) {
                             ++currentFormPage
                         }
                     },
+                    onTitleFocusChange = {
+                        trainingPlanState.title.value = with(trainingPlanState.title.value) {
+                            copy(selection = TextRange(start = 0, end = text.length))
+                        }
+                    },
                     onDescriptionChange = {
-                        trainingPlanSource.value = trainingPlanSource.value.copy(
-                            description = it
-                        )
+                        trainingPlanState.description.value = it
+                    },
+                    onDescriptionFocusChange = {
+                        trainingPlanState.description.value =
+                            with(trainingPlanState.description.value) {
+                                copy(selection = TextRange(start = 0, end = text.length))
+                            }
                     },
                     onAddExercise = {
-                        with(trainingPlanSource.value) {
-                            trainingPlanSource.value = copy(
-                                exercises = exercises.toMutableList().apply {
-                                    add(
-                                        TrainingPlanExerciseView(
-                                            exercise = it.first,
-                                            title = it.second.first.first,
-                                            notes = it.second.first.second,
-                                            sets = it.second.second,
-                                            reps = it.second.third
-                                        )
+                        with(trainingPlanState) {
+                            exercises.value = exercises.value.toMutableList().apply {
+                                performExerciseTip = true
+                                add(
+                                    TrainingPlanExerciseView(
+                                        exercise = it.first,
+                                        title = it.second.first.first,
+                                        notes = it.second.first.second,
+                                        sets = it.second.second,
+                                        reps = it.second.third
                                     )
-                                }
-                            )
+                                )
+                            }
                         }
                     },
                     onEditExerciseClick = { id ->
-                        trainingPlanSource.value.exercises
+                        trainingPlanState.exercises.value
                             .find { it.exercise == id }
                             ?.also { exercise ->
                                 selectedTrainingExercise.update(
@@ -226,17 +260,16 @@ fun TrainingPlanRegisterScreen(
                                     sets = exercise.sets,
                                     reps = exercise.reps
                                 )
+                                coroutineScope.launch {
+                                    modalExerciseEditionState.animateTo(ModalBottomSheetValue.Expanded)
+                                }
                             }
-                        coroutineScope.launch {
-                            modalExerciseEditionState.animateTo(ModalBottomSheetValue.Expanded)
-                        }
                     },
                     onDetailsExerciseClick = onDetailExercise,
                     onDeleteExerciseClick = { id ->
-                        with(trainingPlanSource.value) {
-                            trainingPlanSource.value = copy(
-                                exercises = exercises.toMutableList().filter { it.exercise != id }
-                            )
+                        with(trainingPlanState) {
+                            exercises.value =
+                                exercises.value.toMutableList().filter { it.exercise != id }
                         }
                     },
                     onExerciseQueryChange = {
@@ -253,13 +286,29 @@ fun TrainingPlanRegisterScreen(
                 },
                 enabled = nextButtonEnableState.value,
                 trainingPlanState = trainingPlanState,
-                onClick = { (currentFormPage < 2).also { if (it) ++currentFormPage } },
+                onClick = {
+                    (currentFormPage < 2).also {
+                        if (it) ++currentFormPage else focusManager.clearFocus()
+                    }
+                },
                 onIntent = onIntent
             )
         }
     }
     ContentLoadingProgressBar(visible = showBlockProgress)
 
+    val successfulSavingPlanConfirmationResource = object {
+        val id = R.id.training_plan_register_saved_action_confirmation
+        val title = stringResource(
+            id = R.string.training_plan_register_successful_saved_title
+        )
+        val message = stringResource(
+            id = R.string.training_plan_register_successful_saved_message
+        )
+        val positiveButton = stringResource(
+            id = R.string.training_plan_register_successful_saved_positive_button
+        )
+    }
     LaunchedEffect(key1 = Unit) {
         events.collect { event ->
             when (event) {
@@ -279,15 +328,40 @@ fun TrainingPlanRegisterScreen(
                     when (event.content) {
                         is TrainingPlanRegisterState.ShowPlan -> {
                             initialState = calculateState(plan = event.content.plan)
-                            trainingPlanSource.value = event.content.plan
+                            trainingPlanState.fromView(view = event.content.plan)
                         }
                         is TrainingPlanRegisterState.ShowExerciseSuggestions -> {
                             exercisesSuggestions.clear()
                             exercisesSuggestions.addAll(
-                                event.content.exercises.map { Pair(it.exercise, it.title) }
+                                event.content.exercises.map { Pair(it.id, it.title) }
                             )
                         }
+                        is TrainingPlanRegisterState.ShowPlanSuccessfulSavedMessage -> {
+                            modalBottomSheetAlert
+                                .showAlert(
+                                    callId = successfulSavingPlanConfirmationResource.id,
+                                    type = ModalBottomSheetAlertState.ModalType.Info,
+                                    title = successfulSavingPlanConfirmationResource.title,
+                                    message = successfulSavingPlanConfirmationResource.message,
+                                    positiveButtonLabel = successfulSavingPlanConfirmationResource
+                                        .positiveButton
+                                )
+                        }
                         else -> Unit
+                    }
+                }
+                is AppState.Error -> event.apply {
+                    focusManager.clearFocus()
+                    if (cause is NoConnectivityException) {
+                        modalBottomSheetAlert
+                            .showConnectivityErrorAlert(
+                                callId = R.id.training_plan_register_connectivity_error
+                            )
+                    } else {
+                        modalBottomSheetAlert
+                            .showGenericErrorAlert(
+                                callId = R.id.training_plan_register_generic_error
+                            )
                     }
                 }
                 else -> Unit
@@ -296,11 +370,26 @@ fun TrainingPlanRegisterScreen(
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
-        asClickedState(R.id.training_plan_register_unsaved_action_confirmation) {
+        asClickedState(
+            R.id.training_plan_register_unsaved_action_confirmation,
+            R.id.training_plan_register_saved_action_confirmation,
+        ) {
             hide()
             when (this) {
                 is ModalBottomSheetAlertResultState.PositiveClicked -> {
                     onNavigateBack()
+                }
+                else -> Unit
+            }
+        }
+        asClickedState(
+            R.id.training_plan_register_connectivity_error,
+            R.id.training_plan_register_generic_error,
+        ) {
+            hide()
+            when (this) {
+                is ModalBottomSheetAlertResultState.PositiveClicked -> {
+                    onIntent(TrainingPlanRegisterIntent.SavePlan(plan = trainingPlanState.toView()))
                 }
                 else -> Unit
             }
@@ -329,6 +418,7 @@ private fun TopBar(
     modalBottomSheetAlert: ModalBottomSheetAlert,
     focusManager: FocusManager,
     askForSave: Boolean,
+    onSaveClick: () -> Unit,
     onPreviousPage: () -> Boolean,
     onNavigateBack: () -> Unit,
 ) {
@@ -347,6 +437,7 @@ private fun TopBar(
             id = R.string.training_plan_register_back_action_confirmation_negative_button
         )
     }
+
     fun onBackPress() {
         if (!onPreviousPage()) {
             if (askForSave) {
@@ -373,8 +464,15 @@ private fun TopBar(
         actionIcons = {
             if (showTopProgress) {
                 CircularProgressIndicator(
+                    modifier = Modifier.then(Modifier.size(24.dp)),
                     color = AppTheme.colors.material.secondary
                 )
+            }
+            IconButton(
+                enabled = askForSave,
+                onClick = onSaveClick
+            ) {
+                Icon(imageVector = Icons.Filled.Save, contentDescription = null)
             }
         },
         onNavigateBack = {
@@ -407,12 +505,7 @@ private fun BottomActionButton(
                 if (!onClick()) {
                     onIntent(
                         TrainingPlanRegisterIntent.SavePlan(
-                            plan = TrainingPlanView(
-                                id = trainingPlanState.id.value,
-                                title = trainingPlanState.title.value,
-                                description = trainingPlanState.description.value,
-                                exercises = trainingPlanState.exercises.value
-                            )
+                            plan = trainingPlanState.toView()
                         )
                     )
                 }

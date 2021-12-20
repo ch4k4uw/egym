@@ -48,6 +48,9 @@ sealed class Screen(
                     Triple("planMetadata", true, null as String?)
                 )
             ) {
+                object ArgsNames {
+                    const val PlanMetadata = "planMetadata"
+                }
                 fun route(planMetadata: String?) =
                     planMetadata
                         ?.let { route.replace("{planMetadata}", it) }

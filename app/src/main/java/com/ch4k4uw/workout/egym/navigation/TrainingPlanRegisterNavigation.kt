@@ -3,15 +3,14 @@ package com.ch4k4uw.workout.egym.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.extensions.RestoreWindowBarsEffect
+import com.ch4k4uw.workout.egym.extensions.parseStringArgAsParcelable
 import com.ch4k4uw.workout.egym.extensions.viewModel
 import com.ch4k4uw.workout.egym.training.plan.list.TrainingPlanListViewModel
 import com.ch4k4uw.workout.egym.training.plan.list.interaction.TrainingPlanListIntent
 import com.ch4k4uw.workout.egym.training.plan.list.interaction.TrainingPlanView
 import com.ch4k4uw.workout.egym.training.plan.register.TrainingPlanRegisterScreen
-import com.ch4k4uw.workout.egym.training.plan.register.interaction.TrainingPlanRegisterState
-import kotlinx.coroutines.flow.flowOf
+import com.ch4k4uw.workout.egym.training.plan.register.TrainingPlanRegisterViewModel
 
 fun NavGraphBuilder.trainingPlanRegisterNavigation(navigationState: NavigationState) {
     composable(
@@ -22,15 +21,17 @@ fun NavGraphBuilder.trainingPlanRegisterNavigation(navigationState: NavigationSt
                 defaultValue = it.third
             }
         }
-    ) { _ ->
-        val plaListViewModel: TrainingPlanListViewModel? =
+    ) { navBackStackEntry ->
+        navBackStackEntry.parseStringArgAsParcelable<TrainingPlanView>(
+            key = Screen.Home.Plan.Register.ArgsNames.PlanMetadata,
+            decoder = navigationState.routeEncode.decodeFromRoute
+        )
+        val planListViewModel: TrainingPlanListViewModel? =
             navigationState.navController.previousBackStackEntry.viewModel()
+        val planRegisterViewModel: TrainingPlanRegisterViewModel =
+            navBackStackEntry.viewModel()
         TrainingPlanRegisterScreen(
-            events = flowOf(
-                AppState.Success(
-                    content = TrainingPlanRegisterState.ShowPlan(plan = TrainingPlanView.Empty)
-                )
-            ),
+            events = planRegisterViewModel.uiState,
             onDetailExercise = {
                 navigationState.navController
                     .navigate(
@@ -39,8 +40,9 @@ fun NavGraphBuilder.trainingPlanRegisterNavigation(navigationState: NavigationSt
             },
             onNavigateBack = {
                 navigationState.navController.navigateUp()
-                plaListViewModel?.performIntent(intent = TrainingPlanListIntent.FetchPlanList)
+                planListViewModel?.performIntent(intent = TrainingPlanListIntent.FetchPlanList)
             },
+            onIntent = planRegisterViewModel::performIntent
         )
         RestoreWindowBarsEffect(navigationState = navigationState)
     }

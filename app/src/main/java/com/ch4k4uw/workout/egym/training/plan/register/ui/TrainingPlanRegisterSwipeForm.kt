@@ -1,7 +1,6 @@
 package com.ch4k4uw.workout.egym.training.plan.register.ui
 
 import android.content.res.Configuration
-import android.os.Bundle
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
@@ -35,18 +34,17 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -54,7 +52,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -73,27 +70,6 @@ private object TrainingPlanRegisterSwipeForm {
 
     const val ANIMATION_DURATION = 300
 
-    @Suppress("unchecked_cast")
-    val textFieldValueSaver: Saver<MutableState<TextFieldValue>, *> = Saver(
-        save = {
-            Bundle().apply {
-                putString("text", it.value.text)
-                putSerializable("sel", Pair(it.value.selection.start, it.value.selection.end))
-            }
-        },
-        restore = {
-            val text = it.getString("text").orEmpty()
-            val selection = it.getSerializable("sel") as? Pair<Int, Int>
-                ?: Pair(text.length, text.length)
-            mutableStateOf(
-                TextFieldValue(
-                    text = text,
-                    selection = TextRange(start = selection.first, end = selection.second)
-                )
-            )
-        }
-    )
-
     const val MAX_DESCRIPTION_LENGTH = 1024
     const val DEFAULT_SETS = 3
     const val DEFAULT_REPS = 12
@@ -104,13 +80,16 @@ fun TrainingPlanRegisterSwipeForm(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     currPage: Int,
-    title: String = "",
-    description: String = "",
+    title: TextFieldValue = TextFieldValue(text = ""),
+    description: TextFieldValue = TextFieldValue(text = ""),
     exercises: List<Pair<String, Triple<Pair<String, String>, Int, Int>>> = listOf(),
     exercisesSuggestions: List<Pair<String, String>> = listOf(),
-    onTitleChange: (String) -> Unit = {},
+    performExerciseTip: Boolean = false,
+    onTitleChange: (TextFieldValue) -> Unit = {},
     onConfirmTitleAction: () -> Unit = {},
-    onDescriptionChange: (String) -> Unit = {},
+    onTitleFocusChange: (FocusState) -> Unit = {},
+    onDescriptionChange: (TextFieldValue) -> Unit = {},
+    onDescriptionFocusChange: (FocusState) -> Unit = {},
     onAddExercise: (Pair<String, Triple<Pair<String, String>, Int, Int>>) -> Unit = {},
     onEditExerciseClick: (String) -> Unit = {},
     onDetailsExerciseClick: (String) -> Unit = {},
@@ -159,6 +138,7 @@ fun TrainingPlanRegisterSwipeForm(
                                     title = title,
                                     focusRequester = planTitleFocusRequester,
                                     onTextChange = onTitleChange,
+                                    onFocusChanged = onTitleFocusChange,
                                     onDone = onConfirmTitleAction
                                 )
                             }
@@ -166,7 +146,8 @@ fun TrainingPlanRegisterSwipeForm(
                                 PlanDescriptionForm(
                                     description = description,
                                     focusRequester = planDescriptionFocusRequester,
-                                    onTextChange = onDescriptionChange
+                                    onTextChange = onDescriptionChange,
+                                    onFocusChanged = onDescriptionFocusChange
                                 )
                             }
                             TrainingPlanRegisterSwipeForm.LayoutId.Third -> {
@@ -174,6 +155,7 @@ fun TrainingPlanRegisterSwipeForm(
                                     exercises = exercises,
                                     suggestions = exercisesSuggestions,
                                     onSearchChange = onExerciseQueryChange,
+                                    performExerciseTip = performExerciseTip,
                                     onAddClick = {
                                         onAddExercise(
                                             Pair(
@@ -229,21 +211,12 @@ fun TrainingPlanRegisterSwipeForm(
 
 @Composable
 private fun PlanTitleForm(
-    title: String,
+    title: TextFieldValue,
     focusRequester: FocusRequester,
-    onTextChange: (String) -> Unit,
+    onTextChange: (TextFieldValue) -> Unit,
+    onFocusChanged: (FocusState) -> Unit,
     onDone: () -> Unit,
 ) {
-    var titleFieldValue by rememberSaveable(
-        saver = TrainingPlanRegisterSwipeForm.textFieldValueSaver
-    ) {
-        mutableStateOf(
-            TextFieldValue(
-                text = title,
-                selection = TextRange(start = 0, end = title.length)
-            )
-        )
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,16 +224,9 @@ private fun PlanTitleForm(
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { state ->
-                    if (state.isFocused) {
-                        titleFieldValue = titleFieldValue.copy(
-                            text = titleFieldValue.text,
-                            selection = TextRange(start = 0, end = title.length)
-                        )
-                    }
-                }
+                .onFocusChanged(onFocusChanged)
                 .focusRequester(focusRequester = focusRequester),
-            value = titleFieldValue,
+            value = title,
             label = {
                 Text(
                     text = stringResource(id = R.string.training_plan_register_form_plan_title_label),
@@ -268,10 +234,7 @@ private fun PlanTitleForm(
                 )
             },
             onValueChange = {
-                if (title != it.text) {
-                    onTextChange(it.text)
-                }
-                titleFieldValue = it
+                onTextChange(it)
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -295,21 +258,11 @@ private fun PlanTitleForm(
 
 @Composable
 private fun PlanDescriptionForm(
-    description: String,
+    description: TextFieldValue,
     focusRequester: FocusRequester,
-    onTextChange: (String) -> Unit
+    onFocusChanged: (FocusState) -> Unit,
+    onTextChange: (TextFieldValue) -> Unit
 ) {
-    var titleFieldValue by rememberSaveable(
-        saver = TrainingPlanRegisterSwipeForm.textFieldValueSaver
-    ) {
-        mutableStateOf(
-            TextFieldValue(
-                text = description,
-                selection = TextRange(start = 0, end = description.length)
-            )
-        )
-    }
-
     val height = with(LocalDensity.current) { (LocalTextStyle.current.fontSize * 10).toDp() }
 
     Column(
@@ -320,16 +273,9 @@ private fun PlanDescriptionForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(height = height)
-                .onFocusChanged { state ->
-                    if (state.isFocused) {
-                        titleFieldValue = titleFieldValue.copy(
-                            text = titleFieldValue.text,
-                            selection = TextRange(start = 0, end = description.length)
-                        )
-                    }
-                }
+                .onFocusChanged(onFocusChanged)
                 .focusRequester(focusRequester = focusRequester),
-            value = titleFieldValue,
+            value = description,
             label = {
                 Text(
                     text = stringResource(
@@ -340,10 +286,7 @@ private fun PlanDescriptionForm(
             },
             onValueChange = {
                 if (it.text.length < TrainingPlanRegisterSwipeForm.MAX_DESCRIPTION_LENGTH) {
-                    if (description != it.text) {
-                        onTextChange(it.text)
-                    }
-                    titleFieldValue = it
+                    onTextChange(it)
                 }
             },
             keyboardOptions = KeyboardOptions(
@@ -368,14 +311,20 @@ private fun PlanDescriptionForm(
 private fun PlanExercisesForm(
     exercises: List<Pair<String, Triple<Pair<String, String>, Int, Int>>>,
     suggestions: List<Pair<String, String>>,
+    performExerciseTip: Boolean,
     onSearchChange: (String) -> Unit,
     onAddClick: (Pair<String, String>) -> Unit,
     onEditClick: (String) -> Unit,
     onDetailsClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
 ) {
-    var isSuggestionExpanded by remember { mutableStateOf(false) }
     var selectedSuggestion by rememberSaveable { mutableStateOf(Pair("", "")) }
+    var isForcingSuggestionsCollapsing by rememberSaveable { mutableStateOf(false) }
+    val isSuggestionExpanded by remember(suggestions) {
+        derivedStateOf {
+            !isForcingSuggestionsCollapsing && suggestions.isNotEmpty() && selectedSuggestion.first.isEmpty()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -391,7 +340,6 @@ private fun PlanExercisesForm(
                     .weight(weight = 1f),
                 expanded = isSuggestionExpanded,
                 onExpandedChange = {
-                    isSuggestionExpanded = !isSuggestionExpanded && suggestions.isNotEmpty()
                 }
             ) {
                 TextField(
@@ -411,13 +359,13 @@ private fun PlanExercisesForm(
                 )
                 ExposedDropdownMenu(
                     expanded = isSuggestionExpanded,
-                    onDismissRequest = { isSuggestionExpanded = false }
+                    onDismissRequest = { isForcingSuggestionsCollapsing = true }
                 ) {
                     suggestions.forEach { suggestion ->
                         DropdownMenuItem(
                             onClick = {
                                 selectedSuggestion = suggestion
-                                isSuggestionExpanded = false
+                                isForcingSuggestionsCollapsing = true
                             }
                         ) {
                             Row(
@@ -427,7 +375,7 @@ private fun PlanExercisesForm(
                                 Text(
                                     modifier = Modifier
                                         .weight(weight = 1f),
-                                    text = suggestion.first
+                                    text = suggestion.second
                                 )
                                 IconButton(
                                     onClick = {
@@ -441,9 +389,9 @@ private fun PlanExercisesForm(
                     }
                 }
             }
-            val addEnableState by remember {
+            val addEnableState by remember(exercises) {
                 derivedStateOf {
-                    selectedSuggestion.first.isNotBlank() && !suggestions.any {
+                    selectedSuggestion.first.isNotBlank() && !exercises.any {
                         it.first == selectedSuggestion.first
                     }
                 }
@@ -453,6 +401,7 @@ private fun PlanExercisesForm(
                 onClick = {
                     onAddClick(selectedSuggestion)
                     selectedSuggestion = Pair("", "")
+                    onSearchChange("")
                 }
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = null)
@@ -474,6 +423,7 @@ private fun PlanExercisesForm(
                         notes = it.second.first.second,
                         sets = it.second.second,
                         reps = it.second.third,
+                        performTip = performExerciseTip,
                         onEditClick = {
                             onEditClick(it.first)
                         },
@@ -487,6 +437,10 @@ private fun PlanExercisesForm(
                 }
             }
         }
+    }
+
+    LaunchedEffect(suggestions.joinToString { it.first }) {
+        isForcingSuggestionsCollapsing = false
     }
 }
 

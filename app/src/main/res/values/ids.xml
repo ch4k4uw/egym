@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="generic_login_error" type="id" />
-    <item name="generic_exercise_list_error" type="id" />
-    <item name="connectivity_exercise_list_error" type="id" />
-    <item name="generic_exercise_detail_error" type="id" />
-    <item name="connectivity_exercise_detail_error" type="id" />
+    <item name="login_generic_error" type="id" />
+    <item name="exercise_list_generic_error" type="id" />
+    <item name="exercise_list_connectivity_error" type="id" />
+    <item name="exercise_detail_generic_error" type="id" />
+    <item name="exercise_detail_connectivity_error" type="id" />
     <item name="training_plan_list_error" type="id" />
     <item name="training_plan_list_fetch_user_error" type="id" />
     <item name="training_plan_list_logout_error" type="id" />
     <item name="training_plan_list_delete_plan_error" type="id" />
     <item name="training_plan_list_delete_confirmation" type="id" />
     <item name="training_plan_register_unsaved_action_confirmation" type="id" />
+    <item name="training_plan_register_connectivity_error" type="id" />
+    <item name="training_plan_register_generic_error" type="id" />
+    <item name="training_plan_register_saved_action_confirmation" type="id" />
 </resources>

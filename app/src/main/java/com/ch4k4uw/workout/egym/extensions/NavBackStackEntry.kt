@@ -34,7 +34,7 @@ inline fun <reified T : Parcelable> NavBackStackEntry.parseStringArgAsParcelable
 ): Bundle? {
     return arguments
         ?.also { args ->
-            val rawValue = args.getString(key)
+            val rawValue = args.get(key) as? String
             if (rawValue != null) {
                 val value = decoder
                     .decode<T>(rawValue)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import java.util.*
 
 @Stable
 class TrainingPlanExerciseEditionState(
@@ -23,6 +24,8 @@ class TrainingPlanExerciseEditionState(
     val sets: State<Int> = mutableSets
     private val mutableReps = mutableStateOf(reps)
     val reps: State<Int> = mutableReps
+    private var mutableUuid = mutableStateOf(UUID.randomUUID().toString())
+    val uuid: State<String> = mutableUuid
 
     fun update(
         exercise: String = this.exercise.value,
@@ -34,6 +37,7 @@ class TrainingPlanExerciseEditionState(
         mutableNotes.value = notes
         mutableSets.value = sets
         mutableReps.value = reps
+        mutableUuid.value = UUID.randomUUID().toString()
     }
 
     companion object {
