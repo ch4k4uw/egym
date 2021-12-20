@@ -5,6 +5,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
@@ -56,6 +58,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.extensions.horizontalDimension
@@ -411,7 +415,10 @@ private fun PlanExercisesForm(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(weight = 1f)
+                .weight(weight = 1f),
+            backgroundColor = Color.Transparent,
+            contentColor = contentColorFor(backgroundColor = AppTheme.colors.material.background),
+            border = BorderStroke(width = Dp.Hairline, color = AppTheme.colors.material.surface)
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -434,6 +441,9 @@ private fun PlanExercisesForm(
                             onDetailsClick(it.first)
                         }
                     )
+                    if(it !== exercises.last()) {
+                        Spacer(modifier = Modifier.height(height = 1.dp))
+                    }
                 }
             }
         }

@@ -175,19 +175,16 @@ private fun SheetContent(
                     Button(
                         onClick = { onPositiveClicked?.invoke() },
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = AppTheme.colors.material.secondary
+                            backgroundColor = AppTheme.colors.material.primary
                         ),
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(size = AppTheme.Dimens.sizing.xsmall)
+                        shape = RoundedCornerShape(percent = 50)
                     ) {
                         Text(text = positiveButtonLabel)
                     }
                 }
                 if (negativeButtonLabel != null) {
-                    if (positiveButtonLabel != null) {
-                        Spacer(modifier = Modifier.height(height = AppTheme.Dimens.spacing.normal))
-                    }
                     OutlinedButton(
                         onClick = { onNegativeClicked?.invoke() },
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -197,7 +194,7 @@ private fun SheetContent(
                         ),
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(size = AppTheme.Dimens.sizing.xsmall)
+                        shape = RoundedCornerShape(percent = 50)
                     ) {
                         Text(text = negativeButtonLabel)
                     }

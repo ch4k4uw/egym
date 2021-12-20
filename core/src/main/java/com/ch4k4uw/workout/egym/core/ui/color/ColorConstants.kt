@@ -21,7 +21,7 @@ internal object ColorConstants {
     private val Amber200Normal = Color(0xffffe082)
     private val DarkGrey = Color(0xff121212)
     private val DarkRed = Color(0xffcf6679)
-    private val LightSurface = Color.White
+    private val LightSurface = Color.LightGray
 
     private val Amber600 = Color(color = 0xFFFFB300)
     private val Amber200 = Color(color = 0xFFFFE082)
@@ -42,14 +42,15 @@ internal object ColorConstants {
                 error = Red50Normal,
                 onPrimary = Amber50Normal,
                 onSecondary = BlueGray900Normal,
-                onBackground = Color.Black,
+                onBackground = DarkGrey,
                 onSurface = Color.Black,
                 onError = Color.White
             ),
             googleButton = LightSurface,
             amber = Amber600,
             green = Green600,
-            deepOrange = DeepOrange600
+            deepOrange = DeepOrange600,
+            shimmer = Color.White,
         )
     }
 
@@ -74,7 +75,8 @@ internal object ColorConstants {
             googleButton = Color(color = 0xFF4285F4),
             amber = Amber200,
             green = Green300,
-            deepOrange = DeepOrange300
+            deepOrange = DeepOrange300,
+            shimmer = Color.DarkGray
         )
     }
 

@@ -175,7 +175,7 @@ fun TrainingPlanRegisterScreen(
                 onNavigateBack = onNavigateBack
             )
             //region swipe-form
-            val surfaceColor = AppTheme.colors.material.primarySurface
+            val surfaceColor = AppTheme.colors.material.background
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()

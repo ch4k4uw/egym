@@ -1,10 +1,14 @@
 package com.ch4k4uw.workout.egym.core.ui
 
 import android.os.Bundle
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -15,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import com.ch4k4uw.workout.egym.core.ui.color.ColorConstants
 import com.ch4k4uw.workout.egym.core.ui.dimens.DimensConstants
@@ -94,7 +99,16 @@ fun AppTheme(
                 CompositionLocalProvider(
                     LocalAppInsetsPaddingValues provides insetsPaddingValues
                 ) {
-                    content()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = AppTheme.colors.material.background)
+                    ) {
+                        val contentColor = AppTheme.colors.material.onBackground
+                        CompositionLocalProvider(LocalContentColor provides contentColor) {
+                            content()
+                        }
+                    }
                 }
             }
         }
