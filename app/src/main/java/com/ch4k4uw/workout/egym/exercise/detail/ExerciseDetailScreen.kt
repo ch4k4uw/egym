@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
@@ -126,9 +127,9 @@ fun ExerciseDetailScreen(
             topBarHeightPx = stateHolder.topBarHeight.toPx()
 
             fontSize = object {
-                val h6 = AppTheme.typography.material.h6.fontSize.toPx()
-                val h4 = AppTheme.typography.material.h4.fontSize.toPx()
-                val currSz = (h6 + ((h4 - h6) * stateHolder.topBarHeightTransition)).toSp()
+                val small = AppTheme.typography.material.body1.fontSize
+                val large = AppTheme.typography.material.h5.fontSize
+                val currSz = lerp (small, large, stateHolder.topBarHeightTransition)
             }.currSz
         }
 
@@ -199,7 +200,7 @@ fun ExerciseDetailScreen(
                             .layoutId(LayoutId.Title)
                             .fillMaxWidth(),
                         text = exerciseDetail.title,
-                        style = AppTheme.typography.material.h6.copy(
+                        style = AppTheme.typography.material.body1.copy(
                             fontSize = fontSize
                         ),
                         maxLines = 1,

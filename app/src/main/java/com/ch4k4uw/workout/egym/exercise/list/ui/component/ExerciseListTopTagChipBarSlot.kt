@@ -36,7 +36,7 @@ fun ExerciseListTopTagChipBarSlot(
                 .padding(all = AppTheme.Dimens.spacing.xtiny),
             mainAxisAlignment = MainAxisAlignment.Center,
             mainAxisSize = SizeMode.Expand,
-            crossAxisSpacing = AppTheme.Dimens.spacing.small,
+            crossAxisSpacing = AppTheme.Dimens.spacing.xtiny,
             mainAxisSpacing = AppTheme.Dimens.spacing.xtiny,
         ) {
             for (tag in exerciseTags) {

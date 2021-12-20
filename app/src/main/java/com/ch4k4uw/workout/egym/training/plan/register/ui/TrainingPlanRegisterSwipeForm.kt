@@ -5,7 +5,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -61,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
+import com.ch4k4uw.workout.egym.common.ui.component.EmptyContentPlaceholder
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.extensions.horizontalDimension
 import com.ch4k4uw.workout.egym.extensions.horizontalLooseConstraints
@@ -102,7 +102,7 @@ fun TrainingPlanRegisterSwipeForm(
 ) {
     var pageSize by rememberSaveable { mutableStateOf(0) }
     val transitionState = remember {
-        MutableTransitionState(0)
+        MutableTransitionState(currPage)
     }.apply { targetState = currPage }
     val transition = updateTransition(
         transitionState = transitionState, label = "cardOffsetTransitionUpdate"
@@ -329,6 +329,7 @@ private fun PlanExercisesForm(
             !isForcingSuggestionsCollapsing && suggestions.isNotEmpty() && selectedSuggestion.first.isEmpty()
         }
     }
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -379,7 +380,8 @@ private fun PlanExercisesForm(
                                 Text(
                                     modifier = Modifier
                                         .weight(weight = 1f),
-                                    text = suggestion.second
+                                    text = suggestion.second,
+                                    style = AppTheme.typography.material.body2
                                 )
                                 IconButton(
                                     onClick = {
@@ -418,31 +420,38 @@ private fun PlanExercisesForm(
                 .weight(weight = 1f),
             backgroundColor = Color.Transparent,
             contentColor = contentColorFor(backgroundColor = AppTheme.colors.material.background),
-            border = BorderStroke(width = Dp.Hairline, color = AppTheme.colors.material.surface)
+            elevation = Dp.Hairline
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(items = exercises, key = { it.first }) {
-                    TrainingPlanExerciseCard(
-                        title = it.second.first.first,
-                        notes = it.second.first.second,
-                        sets = it.second.second,
-                        reps = it.second.third,
-                        performTip = performExerciseTip,
-                        onEditClick = {
-                            onEditClick(it.first)
-                        },
-                        onDeleteClick = {
-                            onDeleteClick(it.first)
-                        },
-                        onDetailsClick = {
-                            onDetailsClick(it.first)
+            if (exercises.isEmpty()) {
+                EmptyContentPlaceholder()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(items = exercises, key = { it.first }) {
+                        TrainingPlanExerciseCard(
+                            title = it.second.first.first,
+                            notes = it.second.first.second,
+                            sets = it.second.second,
+                            reps = it.second.third,
+                            performTip = performExerciseTip,
+                            onEditClick = {
+                                focusManager.clearFocus()
+                                onEditClick(it.first)
+                            },
+                            onDeleteClick = {
+                                focusManager.clearFocus()
+                                onDeleteClick(it.first)
+                            },
+                            onDetailsClick = {
+                                focusManager.clearFocus()
+                                onDetailsClick(it.first)
+                            }
+                        )
+                        if (it !== exercises.last()) {
+                            Spacer(modifier = Modifier.height(height = 1.dp))
                         }
-                    )
-                    if(it !== exercises.last()) {
-                        Spacer(modifier = Modifier.height(height = 1.dp))
                     }
                 }
             }

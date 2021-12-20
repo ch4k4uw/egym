@@ -148,12 +148,7 @@ fun TrainingPlanExerciseCard(
                                 .fillMaxHeight(),
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = title,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                style = AppTheme.typography.material.h6,
-                            )
+                            ExerciseTitleText(title)
                         }
                         IconButton(
                             onClick = {
@@ -176,23 +171,8 @@ fun TrainingPlanExerciseCard(
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.Bottom
                     ) {
-                        Text(
-                            modifier = Modifier
-                                .weight(weight = 1f),
-                            text = notes,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            style = AppTheme.typography.material.subtitle1,
-                        )
-                        Text(
-                            text = stringResource(
-                                id = R.string.training_plan_exercise_card_sets_and_resp_label,
-                                sets,
-                                reps
-                            ),
-                            maxLines = 1,
-                            style = AppTheme.typography.material.subtitle2,
-                        )
+                        ExerciseNotesText(modifier = Modifier.weight(weight = 1f), notes = notes)
+                        ExerciseSetsAndReps(sets = sets, reps = reps)
                     }
                 }
             }
@@ -235,6 +215,40 @@ fun TrainingPlanExerciseCard(
             innerPerformTip = false
         }
     }
+}
+
+@Composable
+private fun ExerciseTitleText(title: String) {
+    Text(
+        text = title,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        style = AppTheme.typography.material.body1,
+    )
+}
+
+@Composable
+private fun ExerciseNotesText(modifier: Modifier, notes: String) {
+    Text(
+        modifier = modifier,
+        text = notes,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        style = AppTheme.typography.material.caption,
+    )
+}
+
+@Composable
+private fun ExerciseSetsAndReps(sets: Int, reps: Int) {
+    Text(
+        text = stringResource(
+            id = R.string.training_plan_exercise_card_sets_and_resp_label,
+            sets,
+            reps
+        ),
+        maxLines = 1,
+        style = AppTheme.typography.material.body2,
+    )
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showSystemUi = true)

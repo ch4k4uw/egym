@@ -260,11 +260,11 @@ private fun Counter(
                     }
                 ),
                 singleLine = true,
-                textStyle = AppTheme.typography.material.h6.copy(
+                textStyle = AppTheme.typography.material.body1.copy(
                     textAlign = TextAlign.Center
                 ),
                 label = {
-                    Text(text = label, style = AppTheme.typography.material.body1)
+                    Text(text = label, style = AppTheme.typography.material.caption)
                 }
             )
             IconButton(onClick = onIncreaseClick) {
