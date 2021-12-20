@@ -29,9 +29,7 @@ fun ExerciseListTagChip(
     Surface(
         modifier = Modifier.padding(end = AppTheme.Dimens.spacing.xtiny),
         elevation = AppTheme.Dimens.spacing.xtiny,
-        shape = RoundedCornerShape(size = with(LocalDensity.current) {
-            MaterialTheme.typography.body2.fontSize.toDp()
-        }),
+        shape = RoundedCornerShape(percent = 50),
         color = if(isSelected)
             AppTheme.colors.material.secondaryVariant
         else
@@ -47,7 +45,7 @@ fun ExerciseListTagChip(
         ) {
             Text(
                 text = tag.displayText,
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.caption,
                 color = AppTheme.colors.material.onSecondary,
                 modifier = Modifier.padding(all = AppTheme.Dimens.spacing.xtiny)
             )

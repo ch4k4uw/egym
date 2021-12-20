@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -59,13 +58,9 @@ fun ListLoadingShimmer1(
             )
         )
 
-        val isLight = AppTheme.colors.material.isLight
+        val shimmerColor = AppTheme.colors.shimmer
         val colors = Array(3) {
-            if (isLight) {
-                Color.LightGray.copy(alpha = if (it == 1) .3f else .9f)
-            } else {
-                Color.DarkGray.copy(alpha = if (it == 1) .3f else .9f)
-            }
+            shimmerColor.copy(alpha = if (it == 1) .3f else .9f)
         }.toList()
 
         LazyColumn {

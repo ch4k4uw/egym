@@ -29,6 +29,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
@@ -56,7 +57,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.ch4k4uw.workout.egym.R
+import com.ch4k4uw.workout.egym.common.ui.component.EmptyContentPlaceholder
 import com.ch4k4uw.workout.egym.core.ui.AppTheme
 import com.ch4k4uw.workout.egym.extensions.horizontalDimension
 import com.ch4k4uw.workout.egym.extensions.horizontalLooseConstraints
@@ -98,7 +102,7 @@ fun TrainingPlanRegisterSwipeForm(
 ) {
     var pageSize by rememberSaveable { mutableStateOf(0) }
     val transitionState = remember {
-        MutableTransitionState(0)
+        MutableTransitionState(currPage)
     }.apply { targetState = currPage }
     val transition = updateTransition(
         transitionState = transitionState, label = "cardOffsetTransitionUpdate"
@@ -325,6 +329,7 @@ private fun PlanExercisesForm(
             !isForcingSuggestionsCollapsing && suggestions.isNotEmpty() && selectedSuggestion.first.isEmpty()
         }
     }
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -375,7 +380,8 @@ private fun PlanExercisesForm(
                                 Text(
                                     modifier = Modifier
                                         .weight(weight = 1f),
-                                    text = suggestion.second
+                                    text = suggestion.second,
+                                    style = AppTheme.typography.material.body2
                                 )
                                 IconButton(
                                     onClick = {
@@ -411,29 +417,42 @@ private fun PlanExercisesForm(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(weight = 1f)
+                .weight(weight = 1f),
+            backgroundColor = Color.Transparent,
+            contentColor = contentColorFor(backgroundColor = AppTheme.colors.material.background),
+            elevation = Dp.Hairline
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(items = exercises, key = { it.first }) {
-                    TrainingPlanExerciseCard(
-                        title = it.second.first.first,
-                        notes = it.second.first.second,
-                        sets = it.second.second,
-                        reps = it.second.third,
-                        performTip = performExerciseTip,
-                        onEditClick = {
-                            onEditClick(it.first)
-                        },
-                        onDeleteClick = {
-                            onDeleteClick(it.first)
-                        },
-                        onDetailsClick = {
-                            onDetailsClick(it.first)
+            if (exercises.isEmpty()) {
+                EmptyContentPlaceholder()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(items = exercises, key = { it.first }) {
+                        TrainingPlanExerciseCard(
+                            title = it.second.first.first,
+                            notes = it.second.first.second,
+                            sets = it.second.second,
+                            reps = it.second.third,
+                            performTip = performExerciseTip,
+                            onEditClick = {
+                                focusManager.clearFocus()
+                                onEditClick(it.first)
+                            },
+                            onDeleteClick = {
+                                focusManager.clearFocus()
+                                onDeleteClick(it.first)
+                            },
+                            onDetailsClick = {
+                                focusManager.clearFocus()
+                                onDetailsClick(it.first)
+                            }
+                        )
+                        if (it !== exercises.last()) {
+                            Spacer(modifier = Modifier.height(height = 1.dp))
                         }
-                    )
+                    }
                 }
             }
         }

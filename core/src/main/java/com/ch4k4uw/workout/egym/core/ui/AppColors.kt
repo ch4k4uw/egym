@@ -10,5 +10,6 @@ class AppColors(
     val googleButton: Color,
     val amber: Color,
     val green: Color,
-    val deepOrange: Color
+    val deepOrange: Color,
+    val shimmer: Color,
 )

@@ -69,13 +69,9 @@ fun ShimmerCardListItem2(
             )
         )
 
-        val isLight = AppTheme.colors.material.isLight
+        val shimmerColor = AppTheme.colors.shimmer
         val colors = Array(3) {
-            if (isLight) {
-                Color.LightGray.copy(alpha = if (it == 1) .3f else .9f)
-            } else {
-                Color.DarkGray.copy(alpha = if (it == 1) .3f else .9f)
-            }
+            shimmerColor.copy(alpha = if (it == 1) .3f else .9f)
         }.toList()
 
         val brush = linearGradient(

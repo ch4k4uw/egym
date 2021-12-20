@@ -1,7 +1,6 @@
 package com.ch4k4uw.workout.egym.exercise.detail
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -17,13 +16,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.ch4k4uw.workout.egym.R
 import com.ch4k4uw.workout.egym.common.state.AppState
 import com.ch4k4uw.workout.egym.core.common.domain.data.NoConnectivityException
@@ -124,9 +127,9 @@ fun ExerciseDetailScreen(
             topBarHeightPx = stateHolder.topBarHeight.toPx()
 
             fontSize = object {
-                val h6 = AppTheme.typography.material.h6.fontSize.toPx()
-                val h4 = AppTheme.typography.material.h4.fontSize.toPx()
-                val currSz = (h6 + ((h4 - h6) * stateHolder.topBarHeightTransition)).toSp()
+                val small = AppTheme.typography.material.body1.fontSize
+                val large = AppTheme.typography.material.h5.fontSize
+                val currSz = lerp (small, large, stateHolder.topBarHeightTransition)
             }.currSz
         }
 
@@ -134,79 +137,81 @@ fun ExerciseDetailScreen(
             modifier = Modifier
                 .nestedScroll(connection = stateHolder.nestedScrollConnection),
             content = {
-                Surface(
-                    modifier = Modifier
-                        .layoutId(LayoutId.TopBar)
-                        .fillMaxWidth()
-                        .height(height = topBarHeight)
-                        .background(color = AppTheme.colors.material.primarySurface),
-                    elevation = AppBarDefaults.TopAppBarElevation
-                ) {
-                    val image by rememberBitmapLoader(url = coverUrl)
-                    if (image == null) {
-                        ShimmerRectangle1(
-                            height = topBarHeight,
-                        )
-                    } else {
-                        val bitmap = image?.getOrNull()
-                        if (bitmap != null) {
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                alpha = (1.7f * stateHolder.topBarHeightTransition)
-                                    .coerceIn(0f, 1f)
+                val backgroundColor = AppTheme.colors.material.primarySurface
+                val contentColor = contentColorFor(backgroundColor = backgroundColor)
+                CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    Surface(
+                        modifier = Modifier
+                            .layoutId(LayoutId.TopBar)
+                            .fillMaxWidth()
+                            .height(height = topBarHeight),
+                        color = backgroundColor,
+                        elevation = AppBarDefaults.TopAppBarElevation
+                    ) {
+                        val image by rememberBitmapLoader(url = coverUrl)
+                        if (image == null) {
+                            ShimmerRectangle1(
+                                height = topBarHeight,
                             )
                         } else {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.BrokenImage,
-                                    contentDescription = null
+                            val bitmap = image?.getOrNull()
+                            if (bitmap != null) {
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    alpha = (1.7f * stateHolder.topBarHeightTransition)
+                                        .coerceIn(0f, 1f)
                                 )
+                            } else {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.BrokenImage,
+                                        contentDescription = null
+                                    )
+                                }
                             }
                         }
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .layoutId(LayoutId.NavIcon)
-                        .height(height = AppBarHeight)
-                        .width(width = TitleIconWith - AppBarHorizontalPadding),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { onNavigateBack() }
+                    Row(
+                        modifier = Modifier
+                            .layoutId(LayoutId.NavIcon)
+                            .height(height = AppBarHeight)
+                            .width(width = TitleIconWith - AppBarHorizontalPadding),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "",
-                            tint = AppTheme.colors.material.onSurface
+                        IconButton(
+                            onClick = { onNavigateBack() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = ""
+                            )
+                        }
+                    }
+                    Text(
+                        modifier = Modifier
+                            .layoutId(LayoutId.Title)
+                            .fillMaxWidth(),
+                        text = exerciseDetail.title,
+                        style = AppTheme.typography.material.body1.copy(
+                            fontSize = fontSize
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (isLoading) {
+                        ShimmerRectangle1(
+                            layoutId = LayoutId.TitleShimmer,
+                            height = with(LocalDensity.current) { fontSize.toDp() },
                         )
                     }
-                }
-                Text(
-                    modifier = Modifier
-                        .layoutId(LayoutId.Title)
-                        .fillMaxWidth(),
-                    text = exerciseDetail.title,
-                    style = AppTheme.typography.material.h6.copy(
-                        fontSize = fontSize
-                    ),
-                    color = AppTheme.colors.material.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                if (isLoading) {
-                    ShimmerRectangle1(
-                        layoutId = LayoutId.TitleShimmer,
-                        height = with(LocalDensity.current) { fontSize.toDp() },
-                    )
                 }
                 val scrollSate = rememberScrollState()
                 if (!isLoading) {
@@ -222,7 +227,6 @@ fun ExerciseDetailScreen(
                                 .fillMaxWidth(),
                             text = exerciseDetail.description,
                             style = AppTheme.typography.material.h6,
-                            color = AppTheme.colors.material.onSurface,
                         )
                         Spacer(
                             modifier = Modifier
@@ -238,7 +242,6 @@ fun ExerciseDetailScreen(
                                 exerciseDetail.tags.joinToString { "#$it" }
                             ),
                             style = AppTheme.typography.material.h6,
-                            color = AppTheme.colors.material.onSurface,
                         )
                     }
                 }
@@ -279,7 +282,8 @@ fun ExerciseDetailScreen(
             }
 
             val placeable = measure.mapIndexed { i, it ->
-                val isTitle = i == indexes[LayoutId.Title] || i == indexes[LayoutId.TitleShimmer]
+                val isTitle =
+                    i == indexes[LayoutId.Title] || i == indexes[LayoutId.TitleShimmer]
                 it.measure(
                     constraints = constraints.copy(
                         maxWidth = constraints.maxWidth - if (isTitle) {
@@ -391,7 +395,10 @@ fun ExerciseDetailScreen(
     }
 
     ModalBottomSheetAlertEffect(modalAlert = modalBottomSheetAlert) {
-        asClickedState(R.id.exercise_detail_connectivity_error, R.id.exercise_detail_generic_error) {
+        asClickedState(
+            R.id.exercise_detail_connectivity_error,
+            R.id.exercise_detail_generic_error
+        ) {
             hide()
             when (this) {
                 is ModalBottomSheetAlertResultState.PositiveClicked ->

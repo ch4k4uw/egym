@@ -101,7 +101,7 @@ fun ExerciseListTopSearchBar(
                             text = stringResource(
                                 R.string.exercise_list_top_search_bar_search_placeholder
                             ),
-                            style = AppTheme.typography.material.h6.copy(
+                            style = AppTheme.typography.material.body1.copy(
                                 color = AppTheme.colors.material.onSecondary.copy(
                                     alpha = PlaceholderTextAlpha
                                 )
@@ -146,6 +146,7 @@ fun ExerciseListTopSearchBar(
                         backgroundColor = Color.Transparent,
                         cursorColor = AppTheme.colors.material.onSecondary
                     ),
+                    textStyle = AppTheme.typography.material.body1,
                     singleLine = true
                 )
             }

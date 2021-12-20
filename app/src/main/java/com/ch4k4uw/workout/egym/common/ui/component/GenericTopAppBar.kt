@@ -41,15 +41,15 @@ fun GenericTopAppBar(
                 Text(
                     text = title,
                     style = if (queryText.isBlank()) {
-                        AppTheme.typography.material.h6
+                        AppTheme.typography.material.body1
                     } else {
-                        AppTheme.typography.material.subtitle1
+                        AppTheme.typography.material.body2
                     }
                 )
                 if (queryText.isNotBlank()) {
                     Text(
                         text = queryText,
-                        style = AppTheme.typography.material.subtitle2.copy(
+                        style = AppTheme.typography.material.caption.copy(
                             color = AppTheme.colors.material.secondary
                         ),
                         maxLines = 1,

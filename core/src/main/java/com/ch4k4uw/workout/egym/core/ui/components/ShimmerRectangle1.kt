@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,13 +49,9 @@ fun ShimmerRectangle1(
     val gradientWidth by remember {
         derivedStateOf { .4f * heightPx }
     }
-    val isLight = AppTheme.colors.material.isLight
+    val shimmerColor = AppTheme.colors.shimmer
     val colors = Array(3) {
-        if (isLight) {
-            Color.LightGray.copy(alpha = if (it == 1) .3f else .9f)
-        } else {
-            Color.DarkGray.copy(alpha = if (it == 1) .3f else .9f)
-        }
+        shimmerColor.copy(alpha = if (it == 1) .3f else .9f)
     }.toList()
     val x1 = -gradientWidth + ((widthPx + gradientWidth) * animationState.transition.value)
     val x2 = (widthPx + gradientWidth) * animationState.transition.value
