@@ -58,13 +58,13 @@ android {
             buildConfigField("String", "TABLE_EXERCISE", "\"exercise\"")
             buildConfigField("String", "TABLE_TRAINING_PLAN", "\"dev-training-plan\"")
             buildConfigField("String", "TABLE_TRAINING_EXECUTION", "\"dev-training-exec\"")
-            buildConfigField("String", "HELPER_API_URL", "\"https://egymfunc.ddns.net:8080\"")
+            buildConfigField("String", "HELPER_API_URL", "\"https://armageddon.servehttp.com:8080\"")
         }
         release {
             buildConfigField("String", "TABLE_EXERCISE", "\"exercise\"")
             buildConfigField("String", "TABLE_TRAINING_PLAN", "\"training-plan\"")
             buildConfigField("String", "TABLE_TRAINING_EXECUTION", "\"training-exec\"")
-            buildConfigField("String", "HELPER_API_URL", "\"https://egymfunc.ddns.net:8080\"")
+            buildConfigField("String", "HELPER_API_URL", "\"https://armageddon.servehttp.com:8080\"")
         }
     }
 }
